@@ -130,6 +130,7 @@
     "typeindex": "cpp",
     "typeinfo": "cpp",
     "variant": "cpp",
-    "__nullptr": "cpp"
-  }
+    "__nullptr": "cpp",
+    "stack": "cpp"
+}
 }

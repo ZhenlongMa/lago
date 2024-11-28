@@ -1,13 +1,29 @@
+// MIT License
+
+// Copyright (c) 2021 ByteDance Inc. All rights reserved.
+// Copyright (c) 2021 Duke University.  All rights reserved.
+
+// See LICENSE for license information
+
+// This file defines the global information and configuration of HTN test.
+
 #include <gflags/gflags.h>
 #include <glog/logging.h>
 
 #include <infiniband/mlx5dv.h>
 #include <infiniband/verbs.h>
+#include <sys/socket.h>
+#include <sys/time.h>
+#include <stdlib>
+
+#include "htn_context.hh"
 
 DECLARE_string(dev);
 DECLARE_int32(gid);
+DECLARE_int32(port);
 
 DECLARE_bool(server);
+DECLARE_string(connect_ip);
 DECLARE_string(traffic);
 
 namespace Htn {
@@ -35,6 +51,19 @@ public:
     } info;
 };
 
+struct test_qp {
+    service_type;
+    write_num;
+    read_num;
+    send_recv_num;
+    mr_num;
+    sg_num;
+    data_size;
+};
+
 int Initialize(int argc, char **argv);
+struct ibv_qp_attr MakeQpAttr(enum ibv_qp_state, enum ibv_qp_type,
+                              int remote_qpn, const union ibv_gid &remote_gid,
+                              int *attr_mask);
 
 }
