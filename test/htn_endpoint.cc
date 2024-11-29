@@ -53,14 +53,9 @@ int rdma_endpoint::PostSend(const std::vector<rdma_request> &requests,
         }
         wr_list[i].send_flags = (i == batch_size - 1) ? IBV_SEND_SIGNALED : 0;
         // Inline if we can
-#ifdef GDR
-        if (wr_size <= kInlineThresh && wr_list[i].opcode != IBV_WR_RDMA_READ &&
-            !FLAGS_use_cuda)
-        wr_list[i].send_flags |= IBV_SEND_INLINE;
-#else
-        if (wr_size <= kInlineThresh && wr_list[i].opcode != IBV_WR_RDMA_READ)
-        wr_list[i].send_flags |= IBV_SEND_INLINE;
-#endif
+        if (wr_size <= kInlineThresh && wr_list[i].opcode != IBV_WR_RDMA_READ) {
+            wr_list[i].send_flags |= IBV_SEND_INLINE;
+        }
         wr_list[i].wr_id = (uint64_t)this;
         wr_list[i].sg_list = sgs[i];
         wr_list[i].next = (i == batch_size - 1) ? nullptr : &wr_list[i + 1];
@@ -69,21 +64,6 @@ int rdma_endpoint::PostSend(const std::vector<rdma_request> &requests,
         req_idx = (req_idx == requests.size() - 1) ? 0 : req_idx + 1;
     }
     struct ibv_send_wr *bad_wr = nullptr;
-#ifdef DEBUG
-    auto wr_p = &wr_list[0];
-    int wr_cnt = 0;
-    while (wr_p) {
-        for (auto i = 0; i < wr_p->num_sge; i++) {
-        LOG(INFO) << wr_cnt << " wr's opcode is " << wr_p->opcode << " , " << i
-                    << " 's sge: "
-                    << " [size] " << wr_p->sg_list[i].length << " [addr] 0x"
-                    << std::hex << wr_p->sg_list[i].addr << " [lkey] 0x"
-                    << wr_p->sg_list[i].lkey;
-        }
-        wr_p = wr_p->next;
-        wr_cnt++;
-    }
-#endif
     if (ibv_post_send(qp_, wr_list, &bad_wr)) {
         PLOG(ERROR) << "ibv_post_send() failed";
         return -1;
@@ -118,24 +98,6 @@ int rdma_endpoint::PostRecv(const std::vector<rdma_request> &requests,
         wr[i].wr_id = reinterpret_cast<uint64_t>(this);
         req_idx = (req_idx == requests.size() - 1) ? 0 : req_idx + 1;
     }
-#ifdef DEBUG
-  // struct ibv_recv_wr *wr_list = wr;
-  // int cnt = 0;
-  // while (wr_list != nullptr) {
-  //     int num_sge = wr_list->num_sge;
-  //     LOG(INFO) << "Receive WR " << cnt << " :";
-  //     for (int i = 0; i < num_sge; i++) {
-  //         LOG(INFO) << " sge " << i
-  //         << "  [size] is " << wr_list->sg_list[i].length
-  //         << std::hex
-  //         << "  [addr] is 0x" << wr_list->sg_list[i].addr
-  //         << "  [lkey] is 0x" << wr_list->sg_list[i].lkey;
-  //     }
-  //     cnt++;
-  //     wr_list = wr_list->next;
-  // }
-
-#endif
     if (auto ret = ibv_post_recv(qp_, wr, &bad_wr)) {
         PLOG(ERROR) << "ibv_post_recv() failed";
         LOG(ERROR) << "Return value is " << ret;

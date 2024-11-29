@@ -35,8 +35,9 @@ int main(int argc, char **argv) {
             LOG(ERROR) << "Server initialization failed!";
             return -1;
         }
-        listen_thread = std::thread(&Listen, server_context);
-        server_thread = std::thread(&ServerLaunch, server_context);
+        // The listen thread continuously monitors the network data.
+        listen_thread = std::thread(&Listen);
+        server_thread = std::thread(&ServerLaunch);
     }
     else {
         std::vector<string> host_list = ParseHost(FLAGS_connect_ip);

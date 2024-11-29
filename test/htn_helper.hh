@@ -26,6 +26,9 @@ DECLARE_bool(server);
 DECLARE_string(connect_ip);
 DECLARE_string(traffic);
 
+DECLARE_int32(cq_sharing_num);
+DECLARE_int32(mr_num_per_qp);
+
 namespace Htn {
 
 class connect_info {

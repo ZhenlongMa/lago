@@ -8,6 +8,11 @@
 
 namespace Htn {
 
+union collie_cq {
+    struct ibv_cq *cq;
+    struct ibv_cq_ex *cq_ex;
+};
+
 class htn_context {
 
     string device_name_;
@@ -18,8 +23,14 @@ class htn_context {
     uint8_t sl_;
     int port_;
     std::queue<int> ids_;
+    
+    // store all endpoints(QPs)
     std::vector<rdma_endpoint *> endpoints_;
     std::vector<struct ibv_pd *> pds_;
+
+    // Transportation
+    std::vector<union collie_cq> send_cqs_;
+    std::vector<union collie_cq> recv_cqs_;
 
     // Connection Setup: Server side
     int Listen();

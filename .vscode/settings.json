@@ -131,6 +131,9 @@
     "typeinfo": "cpp",
     "variant": "cpp",
     "__nullptr": "cpp",
-    "stack": "cpp"
-}
+    "stack": "cpp",
+    "__mutex_base": "cpp",
+    "__locale": "cpp",
+    "ios": "cpp"
+  }
 }
