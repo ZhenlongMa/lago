@@ -31,6 +31,11 @@ DECLARE_int32(mr_num_per_qp);
 
 namespace Htn {
 
+constexpr int kHostInfoKey = 0;
+constexpr int kMemInfoKey = 1;
+constexpr int kChannelInfoKey = 2;
+constexpr int kGoGoKey = 3;
+
 class connect_info {
 public:
     int type;

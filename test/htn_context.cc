@@ -241,8 +241,10 @@ int htn_context::AcceptHandler(int connfd) {
         LOG(ERROR) << "The number of qp should be positive";
         goto out;
     }
+
     // numlock_.lock();
-    if (num_of_recv_ + number_of_qp > num_per_host_ * num_of_hosts_) {
+    if (num_of_recv_ + number_of_qp > num_per_host_ * num_of_hosts_) { // If client's request is out of server's capacity, 
+                                                                       // return ZERO back to client
         LOG(ERROR) << "QP Overflow, request rejected";
         // numlock_.unlock();
         memset(info, 0, sizeof(connect_info));
@@ -368,6 +370,13 @@ out:
     close(connfd);
     free(conn_buf);
     return -1;
+}
+
+rdma_buffer *htn_context::CreateBufferFromInfo(struct connect_info *info) {
+  uint64_t remote_addr = (info->info.memory.remote_addr);
+  uint32_t rkey = (info->info.memory.remote_K);
+  int size = (info->info.memory.size);
+  return new rdma_buffer(remote_addr, size, 0, rkey);
 }
 
 }
