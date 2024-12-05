@@ -10,7 +10,6 @@ int Initialize(int argc, char **argv) {
     return 0;
 }
 
-
 struct ibv_qp_attr MakeQpAttr(enum ibv_qp_state state, enum ibv_qp_type qp_type,
                               int remote_qpn, const union ibv_gid &remote_gid,
                               int *attr_mask) {
@@ -92,8 +91,7 @@ struct ibv_qp_attr MakeQpAttr(enum ibv_qp_state state, enum ibv_qp_type qp_type,
     return attr;
 }
 
-
-std::vector<string> ParseHost(string host_ip) {
+std::vector<std::string> ParseHost(std::string host_ip) {
     std::vector<std::string> result;
     std::stringstream s_stream(host_ip);
     while (s_stream.good()) {

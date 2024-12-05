@@ -134,6 +134,7 @@
     "stack": "cpp",
     "__mutex_base": "cpp",
     "__locale": "cpp",
-    "ios": "cpp"
-  }
+    "ios": "cpp",
+    "filesystem": "cpp"
+}
 }

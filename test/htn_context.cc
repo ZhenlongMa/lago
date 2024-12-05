@@ -10,6 +10,21 @@
 namespace Htn {
 
 int htn_context::Init() {
+    std::ifstream test_file("test_case_demo");
+    std::string qp_info;
+    while (std::getline(test_file, qp_info)) {
+        test_qp test;
+        std::stringstream qp_info_stream(qp_info);
+        qp_info_stream >> test.service_type;
+        qp_info_stream >> test.write_num;
+        qp_info_stream >> test.read_num;
+        qp_info_stream >> test.send_recv_num;
+        qp_info_stream >> test.mr_num;
+        total_mr_num_ += test.mr_num;
+        qp_info_stream >> test.sg_num;
+        qp_info_stream >> test.data_size;
+        test_case.push_back(test);
+    }
     if (InitDevice() < 0) {
         LOG(ERROR) << "InitDevice() failed";
         return -1;
@@ -37,12 +52,12 @@ int htn_context:: InitDevice() {
     }
     for (int i = 0; i < dev_num; i++) {
         dev = device_list[i];
-        if (!strcmp(ibv_get_device_name(dev), device_name_, strlen(device_name))) {
-            flag = true;
+        if (!strcmp(ibv_get_device_name(dev), device_name_.c_str(), strlen(device_name.c_str()))) {
+            found_device = true;
             break;
         }
     }
-    if (!flag) {
+    if (!found_device) {
         LOG(ERROR) << "Device" << device_name_ << "not found!";
     }
     ctx_ = ibv_open_device(dev);
@@ -67,7 +82,7 @@ int htn_context::InitIds() {
     while (!ids_.empty()) {
         ids_.pop();
     }
-    auto num_of_qps = num_of_hosts_ * num_per_host_;
+    auto num_of_qps = num_of_hosts_ * num_qp_per_host_;
     for (int i = 0; i < num_of_qps; i++) {
         ids_.push(i);
     }
@@ -76,7 +91,7 @@ int htn_context::InitIds() {
 
 int htn_context::InitMemory() {
     // In default, each MR has a identical PD.
-    int pd_num;
+    int pd_num = 1;
     for (int i = 0; i < pd_num; i++) {
         struct ibv_pd *pd = ibv_alloc_pd(ctx_);
         if (!pd) {
@@ -86,16 +101,14 @@ int htn_context::InitMemory() {
         pds_.push_back(pd);
     }
     int buffer_size = FLAGS_buf_size;
-    for (int i = 0; i < mr_num; i++) {
-        auto region =
-            new rdma_region(GetPd(i), buf_size, FLAGS_buf_num, FLAGS_memalign, 0);
+    for (int i = 0; i < total_mr_num_; i++) {
+        htn_region* region = new htn_region(pds_[i], buffer_size, FLAGS_buf_num, false, 0);
         if (region->Mallocate()) {
             LOG(ERROR) << "Region Memory allocation failed";
             break;
         }
         send_mempool_.push_back(region);
-        region =
-            new rdma_region(GetPd(i), buf_size, FLAGS_buf_num, FLAGS_memalign, 0);
+        region = new htn_region(pds_[i], buffer_size, FLAGS_buf_num, false, 0);
         if (region->Mallocate()) {
             LOG(ERROR) << "Region Memory allocation failed";
             break;
@@ -104,7 +117,7 @@ int htn_context::InitMemory() {
     }
 
     // Allocate CQ
-    int cqn = num_of_hosts_ * num_per_host;
+    int cqn = num_of_hosts_ * num_qp_per_host_;
     for (int i = 0; i < cqn; i++) {
         union collie_cq send_cq;
         union collie_cq recv_cq;
@@ -128,7 +141,7 @@ int htn_context::InitMemory() {
 
 
 int htn_context::InitTransport() {
-    rdma_endpoint *ep = nullptr;
+    htn_endpoint *ep = nullptr;
     int cnt = 0;
     while (!ids_.empty()) {
         int id = ids_.front();
@@ -138,7 +151,7 @@ int htn_context::InitTransport() {
         }
         struct ibv_qp_init_attr qp_init_attr = MakeQpInitAttr(
             GetSendCq(id), GetRecvCq(id), FLAGS_send_wq_depth, FLAGS_recv_wq_depth);
-        ibv_qp *qp = ibv_create_qp(GetPd(id), &qp_init_attr);
+        ibv_qp *qp = ibv_create_qp(pds_[id], &qp_init_attr);
         if (!qp) {
             PLOG(ERROR) << "ibv_create_qp() failed";
             delete ep;
@@ -200,7 +213,7 @@ int htn_context::Listen() {
         }
         // [TODO] connection handler
         std::thread handler =
-            std::thread(&rdma_context::AcceptHandler, this, *connfd);
+            std::thread(&htn_context::AcceptHandler, this, *connfd);
         handler.detach();
         free(connfd);
     }
@@ -243,7 +256,7 @@ int htn_context::AcceptHandler(int connfd) {
     }
 
     // numlock_.lock();
-    if (num_of_recv_ + number_of_qp > num_per_host_ * num_of_hosts_) { // If client's request is out of server's capacity, 
+    if (num_of_recv_ + number_of_qp > num_qp_per_host_ * num_of_hosts_) { // If client's request is out of server's capacity, 
                                                                        // return ZERO back to client
         LOG(ERROR) << "QP Overflow, request rejected";
         // numlock_.unlock();
@@ -305,7 +318,7 @@ int htn_context::AcceptHandler(int connfd) {
     // Get the connection channel info from remote
 
     for (int i = left; i < right; i++) {
-        auto ep = (rdma_endpoint *)endpoints_[i];
+        auto ep = (htn_endpoint *)endpoints_[i];
         n = read(connfd, conn_buf, sizeof(connect_info));
         if (n != sizeof(connect_info)) {
             PLOG(ERROR) << "Server read";
@@ -373,10 +386,230 @@ out:
 }
 
 rdma_buffer *htn_context::CreateBufferFromInfo(struct connect_info *info) {
-  uint64_t remote_addr = (info->info.memory.remote_addr);
-  uint32_t rkey = (info->info.memory.remote_K);
-  int size = (info->info.memory.size);
-  return new rdma_buffer(remote_addr, size, 0, rkey);
+    uint64_t remote_addr = (info->info.memory.remote_addr);
+    uint32_t rkey = (info->info.memory.remote_K);
+    int size = (info->info.memory.size);
+    return new rdma_buffer(remote_addr, size, 0, rkey);
+}
+
+// write the information in connect_info into endpoint
+void htn_context::SetEndpointInfo(rdma_endpoint *endpoint,
+                                   struct connect_info *info) {
+    switch (endpoint->GetType()) {
+        case IBV_QPT_UD:
+            endpoint->SetLid((info->info.channel.dlid));
+            endpoint->SetSl((info->info.channel.sl));
+        case IBV_QPT_UC:
+        case IBV_QPT_RC:
+            endpoint->SetQpn((info->info.channel.qp_num));
+            break;
+        default:
+            LOG(ERROR) << "Currently we don't support other type of QP";
+    }
+}
+
+// write the information of endpoint into the connection info
+void htn_context::GetEndpointInfo(rdma_endpoint *endpoint,
+                                   struct connect_info *info) {
+    memset(info, 0, sizeof(connect_info));
+    info->type = (kChannelInfoKey);
+    switch (endpoint->GetType()) {
+        case IBV_QPT_UD:
+            info->info.channel.dlid = (lid_);
+            info->info.channel.sl = (sl_);
+        case IBV_QPT_UC:
+        case IBV_QPT_RC:
+            info->info.channel.qp_num = (endpoint->GetQpn());
+            break;
+        default:
+            LOG(ERROR) << "Currently we don't support other type of QP";
+    }
+}
+
+// connection request, launched by the client
+int htn_context::Connect(const char *server, int port, int connid) {
+    int sockfd = -1;
+    for (int i = 0; i < kMaxConnRetry; i++) {
+        sockfd = ConnectionSetup(server, port);
+        if (sockfd > 0) break;
+        LOG(INFO) << "Try connect to " << server << ":" << port << " failed for "
+                << i + 1 << " times...";
+        sleep(1);
+    }
+    if (sockfd < 0) return -1;
+    htn_endpoint *ep;
+    union ibv_gid remote_gid;
+    char *conn_buf = (char *)malloc(sizeof(connect_info));
+    if (!conn_buf) {
+        LOG(ERROR) << "Malloc for metadata failed";
+        return -1;
+    }
+    connect_info *info = (connect_info *)conn_buf;
+    int number_of_qp, n = 0, rbuf_id = -1;
+    std::vector<htn_buffer *> buffers;
+
+    // exchange host information
+    memset(info, 0, sizeof(connect_info));
+    info->info.host.number_of_qp = (num_qp_per_host_);
+    info->info.host.number_of_mem = (FLAGS_buf_num);
+    memcpy(&info->info.host.gid, &local_gid_, sizeof(union ibv_gid));
+    if (write(sockfd, conn_buf, sizeof(connect_info)) != sizeof(connect_info)) {
+        LOG(ERROR) << "Couldn't send local address";
+        n = -1;
+        goto out;
+    }
+    n = read(sockfd, conn_buf, sizeof(connect_info));
+    if (n != sizeof(connect_info)) {
+        PLOG(ERROR) << "client read";
+        LOG(ERROR) << "Read only " << n << "/" << sizeof(connect_info) << " bytes";
+        goto out;
+    }
+    if (info->type != kHostInfoKey) {
+        LOG(ERROR) << "The First exchange should be host info";
+        goto out;
+    }
+    number_of_qp = (info->info.host.number_of_qp);
+    if (number_of_qp != num_qp_per_host_) {
+        LOG(ERROR) << "Receiver does not support " << num_qp_per_host_ << " senders";
+        goto out;
+    }
+    memcpy(&remote_gid, &info->info.host.gid, sizeof(union ibv_gid));
+
+    // exchange memory information
+    for (int i = 0; i < FLAGS_buf_num; i++) {
+        auto buf = PickNextBuffer(1);
+        if (!buf) {
+            LOG(ERROR) << "Client using buffer error";
+            goto out;
+        }
+        SetInfoByBuffer(info, buf);
+        if (write(sockfd, conn_buf, sizeof(connect_info)) != sizeof(connect_info)) {
+            LOG(ERROR) << "Couldn't send " << i << " memory's info";
+            goto out;
+        }
+        n = read(sockfd, conn_buf, sizeof(connect_info));
+        if (n != sizeof(connect_info)) {
+            PLOG(ERROR) << "Client read";
+            LOG(ERROR) << n << "/" << (int)sizeof(connect_info) << ": Read " << i
+                        << " mem's info failed";
+            goto out;
+        }
+        if ((info->type) != kMemInfoKey) {
+            LOG(ERROR) << "Exchange MemInfo failde. Type received is "
+                        << (info->type);
+            goto out;
+        }
+        auto remote_buf = CreateBufferFromInfo(info);
+        buffers.push_back(remote_buf);
+    }
+
+    rmem_lock_.lock();
+    rbuf_id = remote_mempools_.size();
+    remote_mempools_.push_back(buffers);
+    rmem_lock_.unlock();
+
+    // exchange endpoint information
+    for (int i = 0; i < num_qp_per_host_; i++) {
+        ep = endpoints_[i + connid * num_qp_per_host_];
+        GetEndpointInfo(ep, info);
+        if (write(sockfd, conn_buf, sizeof(connect_info)) != sizeof(connect_info)) {
+            LOG(ERROR) << "Couldn't send " << i << "endpoint's info";
+            goto out;
+        }
+        n = read(sockfd, conn_buf, sizeof(connect_info));
+        if (n != sizeof(connect_info)) {
+            PLOG(ERROR) << "Client Read";
+            LOG(ERROR) << "Read only " << n << "/" << sizeof(connect_info)
+                        << " bytes";
+            goto out;
+        }
+        if ((info->type) != kChannelInfoKey) {
+            LOG(ERROR) << "Exchange Data Failed. Type Received is " << (info->type)
+                        << ", expected " << kChannelInfoKey;
+            goto out;
+        }
+        SetEndpointInfo(ep, info);
+        if (ep->Activate(remote_gid)) {
+            LOG(ERROR) << "Activate " << i << " endpoint failed";
+            goto out;
+        }
+    }
+
+    // go go go!
+    memset(info, 0, sizeof(connect_info));
+    info->type = (kGoGoKey);
+    if (write(sockfd, conn_buf, sizeof(connect_info)) != sizeof(connect_info)) {
+        LOG(ERROR) << "Ask GOGO send failed";
+        goto out;
+    }
+    n = read(sockfd, conn_buf, sizeof(connect_info));
+    if (n != sizeof(connect_info)) {
+        PLOG(ERROR) << "Client Read";
+        LOG(ERROR) << "Read only " << n << " / " << sizeof(connect_info)
+                << " bytes";
+        goto out;
+    }
+    if ((info->type) != kGoGoKey) {
+        LOG(ERROR) << "Ask to Send failed. Receiver reply with " << (info->type)
+                << " But we expect " << kGoGoKey;
+        goto out;
+    }
+    for (int i = 0; i < num_qp_per_host_; i++) {
+        auto ep = endpoints_[i + connid * num_qp_per_host_];
+        ep->SetActivated(true);
+        ep->SetServer(GidToIP(remote_gid));
+        ep->SetMemId(rbuf_id);
+    }
+    close(sockfd);
+    free(conn_buf);
+    return 0;
+out:
+    close(sockfd);
+    free(conn_buf);
+    return -1;
+}
+
+int htn_context::ConnectionSetup(const char *server, int port) {
+    struct addrinfo *res, *t;
+    struct addrinfo hints;
+    memset(&hints, 0, sizeof(hints));
+    hints.ai_family = AF_UNSPEC;
+    hints.ai_socktype = SOCK_STREAM;
+    char *service;
+    int n;
+    int sockfd = -1;
+    int err;
+    if (asprintf(&service, "%d", port) < 0) return -1;
+    n = getaddrinfo(server, service, &hints, &res);
+    if (n < 0) {
+        LOG(ERROR) << gai_strerror(n) << " for " << server << ":" << port;
+        free(service);
+        return -1;
+    }
+    for (t = res; t; t = t->ai_next) {
+        sockfd = socket(t->ai_family, t->ai_socktype, t->ai_protocol);
+        if (sockfd >= 0) {
+            if (!connect(sockfd, t->ai_addr, t->ai_addrlen)) break;
+            close(sockfd);
+            sockfd = -1;
+        }
+    }
+    freeaddrinfo(res);
+    free(service);
+    if (sockfd < 0) {
+        LOG(ERROR) << "Couldn't connect to " << server << ":" << port;
+        return -1;
+    }
+    return sockfd;
+}
+
+void htn_context::SetInfoByBuffer(struct connect_info *info,
+                                   rdma_buffer *buf) {
+  info->type = (kMemInfoKey);
+  info->info.memory.size = (buf->size_);
+  info->info.memory.remote_K = (buf->remote_K_);
+  info->info.memory.remote_addr = (buf->addr_);
+  return;
 }
 
 }
