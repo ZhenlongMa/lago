@@ -27,6 +27,9 @@ DEFINE_int32(max_qp_rd_atom, 16, "max_qp_rd_atom");
 DEFINE_int32(mtu, IBV_MTU_4096,
              "IBV_MTU value: 256/512/1024/2048/4096");
 
+DEFINE_int32(send_wq_depth, 1024, "Send Work Queue depth");
+DEFINE_int32(recv_wq_depth, 1024, "Recv Work Queue depth");
+
 // DEFINE_int32(cq_sharing_num);
 DEFINE_int32(mr_num_per_qp, 1, "");
 
