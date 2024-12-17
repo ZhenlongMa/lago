@@ -14,10 +14,12 @@ namespace Htn{
 
 // test data memory pool
 class htn_buffer {
+public:
     uint64_t addr_;
     uint32_t size_;
     uint32_t local_key_;
     uint32_t remote_key_;
+
     htn_buffer(uint64_t addr, uint32_t size, uint32_t local_key, uint32_t remote_key) :
         addr_(addr), size_(size), local_key_(local_key), remote_key_(remote_key) {}
 };

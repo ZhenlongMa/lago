@@ -45,14 +45,14 @@ int htn_context:: InitDevice() {
     struct ibv_device **device_list = nullptr;
     int dev_num;
     bool found_device = false;
-    device_list = ibv_get_device_list(&n);
+    device_list = ibv_get_device_list(&dev_num);
     if (!device_list) {
         LOG(ERROR) << "ibv_get_device_list() failed!";
         return -1;
     }
     for (int i = 0; i < dev_num; i++) {
         dev = device_list[i];
-        if (!strcmp(ibv_get_device_name(dev), device_name_.c_str(), strlen(device_name.c_str()))) {
+        if (!strncmp(ibv_get_device_name(dev), device_name_.c_str(), strlen(device_name_.c_str()))) {
             found_device = true;
             break;
         }
@@ -139,7 +139,6 @@ int htn_context::InitMemory() {
     return 0;
 }
 
-
 int htn_context::InitTransport() {
     htn_endpoint *ep = nullptr;
     int cnt = 0;
@@ -157,8 +156,8 @@ int htn_context::InitTransport() {
             delete ep;
             return -1;
         }
-        ep = new rdma_endpoint(id, qp);
-        ep->SetMaster(this);
+        ep = new htn_endpoint(id, qp);
+        // ep->SetMaster(this);
         endpoints_[id] = ep;
     }
     return 0;
@@ -229,8 +228,8 @@ int htn_context::AcceptHandler(int connfd) {
     char *conn_buf = (char *)malloc(sizeof(connect_info));
     connect_info *info = (connect_info *)conn_buf;
     union ibv_gid gid;
-    std::vector<rdma_buffer *> buffers;
-    auto reqs = ParseRecvFromStr();
+    std::vector<htn_buffer *> buffers;
+    // auto reqs = ParseRecvFromStr();
     int rbuf_id = -1;
     if (!conn_buf) {
         LOG(ERROR) << "Malloc for exchange buffer failed";
@@ -310,10 +309,10 @@ int htn_context::AcceptHandler(int connfd) {
         }
     }
 
-    rmem_lock_.lock();
+    // rmem_lock_.lock();
     remote_mempools_.push_back(buffers);
     rbuf_id = remote_mempools_.size() - 1;
-    rmem_lock_.unlock();
+    // rmem_lock_.unlock();
 
     // Get the connection channel info from remote
 
@@ -342,19 +341,20 @@ int htn_context::AcceptHandler(int connfd) {
         }
         // Post The first batch
         int first_batch = FLAGS_recv_wq_depth;
-        int batch_size = FLAGS_recv_batch;
+        // int batch_size = FLAGS_recv_batch;
+        int batch_size = 100; // temp set
         size_t idx = 0;
-        while (ep->GetRecvCredits() > 0) {
+        while (ep->recv_credits_ > 0) {
             auto num_to_post = std::min(first_batch, batch_size);
-            if (ep->PostRecv(reqs, idx, num_to_post)) {
-                LOG(ERROR) << "The " << i << " Receiver Post first batch error";
-                goto out;
-            }
+            // if (ep->PostRecv(reqs, idx, num_to_post)) {
+            //     LOG(ERROR) << "The " << i << " Receiver Post first batch error";
+            //     goto out;
+            // }
             first_batch -= num_to_post;
         }
-        ep->SetActivated(true);
-        ep->SetMemId(rbuf_id);
-        ep->SetServer(GidToIP(gid));
+        ep->activated_ = true;
+        ep->rmem_id_ = rbuf_id;
+        ep->remote_server_ = GidToIP(gid);
         LOG(INFO) << "Endpoint " << i << " has started";
     }
 
@@ -385,23 +385,23 @@ out:
     return -1;
 }
 
-rdma_buffer *htn_context::CreateBufferFromInfo(struct connect_info *info) {
+htn_buffer *htn_context::CreateBufferFromInfo(struct connect_info *info) {
     uint64_t remote_addr = (info->info.memory.remote_addr);
     uint32_t rkey = (info->info.memory.remote_K);
     int size = (info->info.memory.size);
-    return new rdma_buffer(remote_addr, size, 0, rkey);
+    return new htn_buffer(remote_addr, size, 0, rkey);
 }
 
 // write the information in connect_info into endpoint
-void htn_context::SetEndpointInfo(rdma_endpoint *endpoint,
+void htn_context::SetEndpointInfo(htn_endpoint *endpoint,
                                    struct connect_info *info) {
-    switch (endpoint->GetType()) {
+    switch (endpoint->qp_type_) {
         case IBV_QPT_UD:
-            endpoint->SetLid((info->info.channel.dlid));
-            endpoint->SetSl((info->info.channel.sl));
+            endpoint->dlid_ = info->info.channel.dlid;
+            endpoint->remote_sl_ = info->info.channel.sl;
         case IBV_QPT_UC:
         case IBV_QPT_RC:
-            endpoint->SetQpn((info->info.channel.qp_num));
+            endpoint->remote_qpn_ = info->info.channel.qp_num;
             break;
         default:
             LOG(ERROR) << "Currently we don't support other type of QP";
@@ -409,17 +409,17 @@ void htn_context::SetEndpointInfo(rdma_endpoint *endpoint,
 }
 
 // write the information of endpoint into the connection info
-void htn_context::GetEndpointInfo(rdma_endpoint *endpoint,
+void htn_context::GetEndpointInfo(htn_endpoint *endpoint,
                                    struct connect_info *info) {
     memset(info, 0, sizeof(connect_info));
     info->type = (kChannelInfoKey);
-    switch (endpoint->GetType()) {
+    switch (endpoint->qp_type_) {
         case IBV_QPT_UD:
-            info->info.channel.dlid = (lid_);
-            info->info.channel.sl = (sl_);
+            info->info.channel.dlid = lid_;
+            info->info.channel.sl = sl_;
         case IBV_QPT_UC:
         case IBV_QPT_RC:
-            info->info.channel.qp_num = (endpoint->GetQpn());
+            info->info.channel.qp_num = endpoint->qp_->qp_num;
             break;
         default:
             LOG(ERROR) << "Currently we don't support other type of QP";
@@ -503,10 +503,10 @@ int htn_context::Connect(const char *server, int port, int connid) {
         buffers.push_back(remote_buf);
     }
 
-    rmem_lock_.lock();
+    // rmem_lock_.lock();
     rbuf_id = remote_mempools_.size();
     remote_mempools_.push_back(buffers);
-    rmem_lock_.unlock();
+    // rmem_lock_.unlock();
 
     // exchange endpoint information
     for (int i = 0; i < num_qp_per_host_; i++) {
@@ -556,9 +556,9 @@ int htn_context::Connect(const char *server, int port, int connid) {
     }
     for (int i = 0; i < num_qp_per_host_; i++) {
         auto ep = endpoints_[i + connid * num_qp_per_host_];
-        ep->SetActivated(true);
-        ep->SetServer(GidToIP(remote_gid));
-        ep->SetMemId(rbuf_id);
+        ep->activated_ = true;
+        ep->remote_server_ = GidToIP(remote_gid);
+        ep->rmem_id_ = rbuf_id;
     }
     close(sockfd);
     free(conn_buf);
@@ -604,12 +604,20 @@ int htn_context::ConnectionSetup(const char *server, int port) {
 }
 
 void htn_context::SetInfoByBuffer(struct connect_info *info,
-                                   rdma_buffer *buf) {
+                                   htn_buffer *buf) {
   info->type = (kMemInfoKey);
   info->info.memory.size = (buf->size_);
-  info->info.memory.remote_K = (buf->remote_K_);
+  info->info.memory.remote_K = (buf->remote_key_);
   info->info.memory.remote_addr = (buf->addr_);
   return;
+}
+
+// WARNING: why is this way?
+std::string htn_context::GidToIP(const union ibv_gid &gid) {
+  std::string ip =
+      std::to_string(gid.raw[12]) + "." + std::to_string(gid.raw[13]) + "." +
+      std::to_string(gid.raw[14]) + "." + std::to_string(gid.raw[15]);
+  return ip;
 }
 
 }

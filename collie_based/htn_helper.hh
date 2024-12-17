@@ -19,6 +19,7 @@
 // #include <stdlib>
 #include <string>
 #include <netdb.h>
+#include<queue>
 
 // #include "htn_context.hh"
 
@@ -39,6 +40,9 @@ DECLARE_int32(mr_num_per_qp);
 // Resource Management
 DECLARE_int32(buf_size);
 DECLARE_int32(buf_num);
+DECLARE_int32(cq_depth);
+DECLARE_int32(send_wq_depth);
+DECLARE_int32(recv_wq_depth);
 
 namespace Htn {
 
@@ -46,6 +50,7 @@ constexpr int kHostInfoKey = 0;
 constexpr int kMemInfoKey = 1;
 constexpr int kChannelInfoKey = 2;
 constexpr int kGoGoKey = 3;
+constexpr int kMaxConnRetry = 10;
 
 class connect_info {
 public:
@@ -86,6 +91,8 @@ struct ibv_qp_attr MakeQpAttr(enum ibv_qp_state, enum ibv_qp_type,
                               int *attr_mask);
 
 std::vector<std::string> ParseHost(std::string host_ip);
-
+struct ibv_qp_init_attr MakeQpInitAttr(struct ibv_cq *send_cq,
+                                       struct ibv_cq *recv_cq,
+                                       int send_wq_depth, int recv_wq_depth);
 }
 #endif

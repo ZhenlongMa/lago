@@ -22,7 +22,7 @@ public:
 };
 
 class htn_endpoint {
-private:
+public:
     struct ibv_qp *qp_ = nullptr;
     uint32_t id_ = 0;
     enum ibv_qp_type qp_type_;
@@ -70,7 +70,7 @@ public:
     //             const std::vector<rdma_buffer *> &remote_buffer);
     // int PostRecv(const std::vector<rdma_request> &requests, size_t &req_idx,
     //             uint32_t batch_size);
-    // int Activate(const union ibv_gid &remote_gid);
+    int Activate(const union ibv_gid &remote_gid);
     // int RestoreFromERR();
     // int SendHandler(struct ibv_wc *wc);
     // int RecvHandler(struct ibv_wc *wc);

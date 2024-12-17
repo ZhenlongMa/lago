@@ -5,14 +5,14 @@
 
 // See LICENSE for license information
 
-#include "endpoint.hh"
+#include "htn_endpoint.hh"
 
-#include "test_context.hh"
+#include "htn_context.hh"
 
 namespace Htn {
-int rdma_endpoint::PostSend(const std::vector<rdma_request> &requests,
-                            size_t &req_idx, uint32_t batch_size,
-                            const std::vector<rdma_buffer *> &remote_buffer) {
+// int htn_endpoint::PostSend(const std::vector<rdma_request> &requests,
+//                             size_t &req_idx, uint32_t batch_size,
+//                             const std::vector<rdma_buffer *> &remote_buffer) {
     // struct ibv_send_wr wr_list[kMaxBatch];
     // struct ibv_sge sgs[kMaxBatch][kMaxSge];
     // size_t rbuf_idx = 0;
@@ -71,10 +71,10 @@ int rdma_endpoint::PostSend(const std::vector<rdma_request> &requests,
     // send_credits_ -= batch_size;
     // send_batch_size_.push(batch_size);
     // return 0;
-}
+// }
 
-int rdma_endpoint::PostRecv(const std::vector<rdma_request> &requests,
-                            size_t &req_idx, uint32_t batch_size) {
+// int htn_endpoint::PostRecv(const std::vector<rdma_request> &requests,
+                            // size_t &req_idx, uint32_t batch_size) {
     // rdma_context *ctx = (rdma_context *)master_;
     // if (recv_credits_ < batch_size) {
     //     LOG(ERROR) << "PostRecv() failed. Credit not available: " << recv_credits_
@@ -107,9 +107,9 @@ int rdma_endpoint::PostRecv(const std::vector<rdma_request> &requests,
     // // No need for recv. Each successful request generates a CQE
     // // recv_batch_size_.push(batch_size);
     // return 0;
-}
+// }
 
-int rdma_endpoint::RestoreFromERR() {
+// int htn_endpoint::RestoreFromERR() {
     // struct ibv_qp_attr attr;
     // int attr_mask;
     // attr_mask = IBV_QP_STATE;
@@ -125,9 +125,9 @@ int rdma_endpoint::RestoreFromERR() {
     //     return -1;
     // }
     // return 0;
-}
+// }
 
-int rdma_endpoint::Activate(const union ibv_gid &remote_gid) {
+int htn_endpoint::Activate(const union ibv_gid &remote_gid) {
     // remote_gid_ = remote_gid;
     // struct ibv_qp_attr attr;
     // int attr_mask;
@@ -167,26 +167,26 @@ int rdma_endpoint::Activate(const union ibv_gid &remote_gid) {
     //         return -1;
     //     }
     // }
-    // return 0;
+    return 0;
 }
 
-int rdma_endpoint::SendHandler(struct ibv_wc *wc) {
+// int htn_endpoint::SendHandler(struct ibv_wc *wc) {
     // auto update_credits = send_batch_size_.front();
     // send_batch_size_.pop();
     // send_credits_ += update_credits;
     // return 0;
-}
+// }
 
-int rdma_endpoint::RecvHandler(struct ibv_wc *wc) {
+// int htn_endpoint::RecvHandler(struct ibv_wc *wc) {
     // // Reply or something else here.
     // // auto update_credits = recv_batch_size_.front();
     // // recv_batch_size_.pop();
     // // recv_credits_ += update_credits;
     // recv_credits_++;
     // return 0;
-}
+// }
 
-void rdma_endpoint::PrintThroughput(uint64_t timestamp) {
+// void htn_endpoint::PrintThroughput(uint64_t timestamp) {
     // if (bytes_sent_last_ == 0) {
     //     timestamp_ = timestamp;
     //     bytes_sent_last_ = bytes_sent_now_;
@@ -211,6 +211,6 @@ void rdma_endpoint::PrintThroughput(uint64_t timestamp) {
     //     msgs_sent_last_ = msgs_sent_now_;
     // }
     // return;
-}
+// }
 
 }  // namespace Collie

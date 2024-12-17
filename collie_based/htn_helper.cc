@@ -1,4 +1,39 @@
+// MIT License
+
+// Copyright (c) 2021 ByteDance Inc. All rights reserved.
+// Copyright (c) 2021 Duke University.  All rights reserved.
+
+// See LICENSE for license information#
+
 #include "htn_helper.hh"
+
+
+// FLAGS
+// Communication Configuration
+DEFINE_string(dev, "mlx5_0", "RDMA NIC device name");
+DEFINE_int32(gid, 3, "GID of the RDMA NIC");
+DEFINE_int32(port, 1234, "port number used for TCP");
+
+DEFINE_bool(server, false, "is server");
+DEFINE_string(connect_ip, "", "IP address of the server");
+// DEFINE_string(traffic);
+DEFINE_int32(min_rnr_timer, 14, "Minimal Receive Not Ready error");
+DEFINE_int32(hop_limit, 16, "Hop limit");
+DEFINE_int32(tos, 0, "Type of Service value");
+DEFINE_int32(qp_timeout, 0, "QP timeout value");
+DEFINE_int32(retry_cnt, 7, "QP retry count");
+DEFINE_int32(rnr_retry, 7, "Receive Not Ready retry count");
+DEFINE_int32(max_qp_rd_atom, 16, "max_qp_rd_atom");
+DEFINE_int32(mtu, IBV_MTU_4096,
+             "IBV_MTU value: 256/512/1024/2048/4096");
+
+// DEFINE_int32(cq_sharing_num);
+DEFINE_int32(mr_num_per_qp, 1, "");
+
+// Resource Management
+DEFINE_int32(cq_depth, 65536, "CQ depth");
+DEFINE_int32(buf_size, 65536, "buffer size");
+DEFINE_int32(buf_num, 1, "The number of buffers owned by one QP");
 
 namespace Htn {
 
@@ -8,6 +43,23 @@ int Initialize(int argc, char **argv) {
     // parse parameters into FLAGS_<DECLARE_xxx>
     gflags::ParseCommandLineFlags(&argc, &argv, true);
     return 0;
+}
+
+struct ibv_qp_init_attr MakeQpInitAttr(struct ibv_cq *send_cq,
+                                       struct ibv_cq *recv_cq,
+                                       int send_wq_depth, int recv_wq_depth) {
+    struct ibv_qp_init_attr qp_init_attr;
+    memset(&qp_init_attr, 0, sizeof(qp_init_attr));
+    // qp_init_attr.qp_type = (enum ibv_qp_type)FLAGS_qp_type;
+    qp_init_attr.sq_sig_all = 0;
+    qp_init_attr.send_cq = send_cq;
+    qp_init_attr.recv_cq = recv_cq;
+    qp_init_attr.cap.max_send_wr = send_wq_depth;
+    qp_init_attr.cap.max_recv_wr = recv_wq_depth;
+    // qp_init_attr.cap.max_send_sge = kMaxSge;
+    // qp_init_attr.cap.max_recv_sge = kMaxSge;
+    // qp_init_attr.cap.max_inline_data = kMaxInline;
+    return qp_init_attr;
 }
 
 struct ibv_qp_attr MakeQpAttr(enum ibv_qp_state state, enum ibv_qp_type qp_type,

@@ -23,7 +23,7 @@ int main(int argc, char **argv) {
             return -1;
         }
         // The listen thread continuously monitors the network data.
-        // listen_thread = std::thread(&Listen);
+        listen_thread = std::thread(&Htn::htn_context::Listen, server_context);
         // server_thread = std::thread(&ServerLaunch);
     }
     else { // client branch
@@ -34,10 +34,10 @@ int main(int argc, char **argv) {
             return -1;
         }
         for (int i = 0; i < host_list.size(); i++) {
-            // if (client_context->Connect(host_list[i])) {
-            //     LOG(ERROR) << "Client connect failed!";
-            //     return -1;
-            // }
+            if (client_context->Connect(host_list[i].c_str(), FLAGS_port, i)) {
+                LOG(ERROR) << "Client connect failed!";
+                return -1;
+            }
         }
         // client_context->ClientLaunch();
     }
