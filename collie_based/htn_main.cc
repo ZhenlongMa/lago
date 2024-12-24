@@ -24,7 +24,7 @@ int main(int argc, char **argv) {
         }
         // The listen thread continuously monitors the network data.
         listen_thread = std::thread(&Htn::htn_context::Listen, server_context);
-        // server_thread = std::thread(&ServerLaunch);
+        server_thread = std::thread(&Htn::htn_context::ServerLaunch, server_context);
     }
     else { // client branch
         std::vector<std::string> host_list = Htn::ParseHost(FLAGS_connect_ip);
@@ -39,7 +39,7 @@ int main(int argc, char **argv) {
                 return -1;
             }
         }
-        // client_context->ClientLaunch();
+        client_context->ClientLaunch();
     }
     listen_thread.join();
     server_thread.join();

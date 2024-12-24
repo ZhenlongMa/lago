@@ -14,7 +14,7 @@
 
 namespace Htn {
 
-union collie_cq {
+union htn_cq {
     struct ibv_cq *cq;
     struct ibv_cq_ex *cq_ex;
 };
@@ -38,8 +38,8 @@ public:
     std::vector<struct ibv_pd *> pds_;
 
     // Transportation
-    std::vector<union collie_cq> send_cqs_;
-    std::vector<union collie_cq> recv_cqs_;
+    std::vector<union htn_cq> send_cqs_;
+    std::vector<union htn_cq> recv_cqs_;
 
     int total_mr_num_ = 0;
 
@@ -122,6 +122,8 @@ public:
     htn_buffer *CreateBufferFromInfo(struct connect_info *info);
     void GetEndpointInfo(htn_endpoint *endpoint, struct connect_info *info);
     void SetEndpointInfo(htn_endpoint *endpoint, struct connect_info *info);
+    int ServerLaunch();
+    int ClientLaunch();
 };
 
 }

@@ -65,9 +65,8 @@ public:
     }
 
 public:
-    // int PostSend(const std::vector<rdma_request> &requests, size_t &req_idx,
-    //             uint32_t batch_size,
-    //             const std::vector<rdma_buffer *> &remote_buffer);
+    int PostSend(std::vector<htn_region *> &mem_pool, test_qp qp_case,
+                            const std::vector<htn_buffer *> &remote_buffer);
     // int PostRecv(const std::vector<rdma_request> &requests, size_t &req_idx,
     //             uint32_t batch_size);
     int Activate(const union ibv_gid &remote_gid);

@@ -10,6 +10,8 @@
 namespace Htn {
 
 int htn_context::Init() {
+    // file format: 
+    // service_type write_num read_num send_recv_num mr_num sg_num data_size
     std::ifstream test_file("test_case_demo");
     std::string qp_info;
     while (std::getline(test_file, qp_info)) {
@@ -25,6 +27,7 @@ int htn_context::Init() {
         qp_info_stream >> test.data_size;
         test_case.push_back(test);
     }
+    num_qp_per_host_ = test_case.size();
     if (InitDevice() < 0) {
         LOG(ERROR) << "InitDevice() failed";
         return -1;
@@ -119,8 +122,8 @@ int htn_context::InitMemory() {
     // Allocate CQ
     int cqn = num_of_hosts_ * num_qp_per_host_;
     for (int i = 0; i < cqn; i++) {
-        union collie_cq send_cq;
-        union collie_cq recv_cq;
+        union htn_cq send_cq;
+        union htn_cq recv_cq;
         send_cq.cq =
             ibv_create_cq(ctx_, FLAGS_cq_depth / cqn, nullptr, nullptr, 0);
         if (!send_cq.cq) {
@@ -569,6 +572,11 @@ out:
     return -1;
 }
 
+// std::vector<htn_request> htn_context::GenerateReq() {
+//     std::vector<htn_request> requests;
+    // for (int i = 0; i < )
+// }
+
 int htn_context::ConnectionSetup(const char *server, int port) {
     struct addrinfo *res, *t;
     struct addrinfo hints;
@@ -605,19 +613,44 @@ int htn_context::ConnectionSetup(const char *server, int port) {
 
 void htn_context::SetInfoByBuffer(struct connect_info *info,
                                    htn_buffer *buf) {
-  info->type = (kMemInfoKey);
-  info->info.memory.size = (buf->size_);
-  info->info.memory.remote_K = (buf->remote_key_);
-  info->info.memory.remote_addr = (buf->addr_);
-  return;
+    info->type = (kMemInfoKey);
+    info->info.memory.size = (buf->size_);
+    info->info.memory.remote_K = (buf->remote_key_);
+    info->info.memory.remote_addr = (buf->addr_);
+    return;
 }
 
 // WARNING: why is this way?
 std::string htn_context::GidToIP(const union ibv_gid &gid) {
-  std::string ip =
-      std::to_string(gid.raw[12]) + "." + std::to_string(gid.raw[13]) + "." +
-      std::to_string(gid.raw[14]) + "." + std::to_string(gid.raw[15]);
-  return ip;
+    std::string ip =
+        std::to_string(gid.raw[12]) + "." + std::to_string(gid.raw[13]) + "." +
+        std::to_string(gid.raw[14]) + "." + std::to_string(gid.raw[15]);
+    return ip;
+}
+
+int htn_context::ServerLaunch() {
+    return 0;
+}
+
+int htn_context::ClientLaunch() {
+
+    // parse request
+
+    while (1) {
+        for (int i = 0; i < endpoints_.size(); i++) {
+            if (endpoints_[i] == nullptr) {
+                continue;
+            }
+            if (endpoints_[i]->activated_ == false) {
+                continue;
+            }
+            if (endpoints_[i]->send_credits_ > test_case[i].write_num + test_case[i].read_num + test_case[i].send_recv_num) {
+                continue;
+            }
+            endpoints_[i]->PostSend(send_mempool_, test_case[i], remote_mempools_[endpoints_[i]->rmem_id_]);
+        }
+    }
+
 }
 
 }
