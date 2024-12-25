@@ -52,6 +52,7 @@ constexpr int kChannelInfoKey = 2;
 constexpr int kGoGoKey = 3;
 constexpr int kMaxConnRetry = 10;
 constexpr int kMaxBatch = 128;
+constexpr int kCqPollDepth = 128;
 
 class connect_info {
 public:

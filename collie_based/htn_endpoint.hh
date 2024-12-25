@@ -71,7 +71,7 @@ public:
     //             uint32_t batch_size);
     int Activate(const union ibv_gid &remote_gid);
     // int RestoreFromERR();
-    // int SendHandler(struct ibv_wc *wc);
+    int SendHandler(struct ibv_wc *wc);
     // int RecvHandler(struct ibv_wc *wc);
     // void PrintThroughput(uint64_t timestamp);
 

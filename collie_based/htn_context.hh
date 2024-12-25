@@ -65,6 +65,7 @@ public:
     int InitIds();
     int InitTransport();
     int AcceptHandler(int connfd);
+    int PollEach(struct ibv_cq *cq);
 
     void SetInfoByBuffer(struct connect_info *info, htn_buffer *buf);
 

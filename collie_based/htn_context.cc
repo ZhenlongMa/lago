@@ -649,8 +649,54 @@ int htn_context::ClientLaunch() {
             }
             endpoints_[i]->PostSend(send_mempool_, test_case[i], remote_mempools_[endpoints_[i]->rmem_id_]);
         }
+        // poll completion
+        for (htn_cq cq : send_cqs_) {
+            if (PollEach(cq.cq) < 0) {
+                LOG(ERROR) << "PollEach failed!";
+                exit(1);
+            }
+        }
     }
+    return 0;
+}
 
+int htn_context::PollEach(struct ibv_cq *cq) {
+    struct ibv_wc wc[kCqPollDepth];
+    int wc_num = 0;
+    int total_wc_num = 0;
+    do {
+        wc_num = ibv_poll_cq(cq, kCqPollDepth, wc);
+        if (wc_num < 0) {
+            PLOG(ERROR) << "ibv_poll_cq() failed";
+            return -1;
+        }
+        for (int i = 0; i < wc_num; i++) {
+            if (wc[i].status != IBV_WC_SUCCESS) {
+                LOG(ERROR) << "Got bad completion status with " << wc[i].status;
+                return -1;
+            }
+            htn_endpoint *endpoint = reinterpret_cast<htn_endpoint *>(wc[i].wr_id);
+            switch (wc[i].opcode) {
+                case IBV_WC_RDMA_WRITE:
+                case IBV_WC_RDMA_READ:
+                case IBV_WC_SEND:
+                    // Client Handle CQE
+                    endpoint->SendHandler(&wc[i]);
+                    break;
+                case IBV_WC_RECV:
+                case IBV_WC_RECV_RDMA_WITH_IMM:
+                    // Server Handle CQE
+                    // endpoint->RecvHandler(&wc[i]);
+                    // break;
+                    // todo
+                default:
+                    LOG(ERROR) << "Unknown opcode " << wc[i].opcode;
+                    return -1;
+            }
+        }
+        total_wc_num += wc_num;
+    } while (wc_num > 0);
+    return total_wc_num;
 }
 
 }

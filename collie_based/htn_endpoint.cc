@@ -79,7 +79,7 @@ int htn_endpoint::PostSend(std::vector<htn_region *> &mem_pool, test_qp qp_case,
         return -1;
     }
     send_credits_ -= batch_size;
-    // send_batch_size_.push(batch_size);
+    send_batch_size_.push(batch_size);
     return 0;
 }
 
@@ -180,12 +180,13 @@ int htn_endpoint::Activate(const union ibv_gid &remote_gid) {
     return 0;
 }
 
-// int htn_endpoint::SendHandler(struct ibv_wc *wc) {
-    // auto update_credits = send_batch_size_.front();
-    // send_batch_size_.pop();
-    // send_credits_ += update_credits;
-    // return 0;
-// }
+int htn_endpoint::SendHandler(struct ibv_wc *wc) {
+    auto update_credits = send_batch_size_.front();
+    send_batch_size_.pop();
+    send_credits_ += update_credits;
+    // todo: trigger post send
+    return 0;
+}
 
 // int htn_endpoint::RecvHandler(struct ibv_wc *wc) {
     // // Reply or something else here.
