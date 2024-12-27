@@ -10,6 +10,7 @@
 namespace Htn {
 
 int htn_context::Init() {
+    std::cout << "context init!" << std::endl;
     // file format: 
     // service_type write_num read_num send_recv_num mr_num sg_num data_size
     std::ifstream test_file("test_case_demo");
@@ -28,27 +29,35 @@ int htn_context::Init() {
         test_case.push_back(test);
     }
     num_qp_per_host_ = test_case.size();
+    std::cout << "test case ready!" << std::endl;
     if (InitDevice() < 0) {
         LOG(ERROR) << "InitDevice() failed";
         return -1;
     }
+    LOG(INFO) << "Finish InitDevice!";
     if (InitMemory() < 0) {
         LOG(ERROR) << "InitMemory() failed";
         return -1;
     }
+    LOG(INFO) << "Finish InitMemory!";
     if (InitTransport() < 0) {
         LOG(ERROR) << "InitTransport() failed";
         return -1;
     }
+    LOG(INFO) << "Finish InitTransport!";
     return 0;
 }
 
 int htn_context:: InitDevice() {
+    //std::cout << "enter InitDevice!" << std::endl;
+    LOG(INFO) << "enter InitDevice!";
     struct ibv_device *dev = nullptr;
     struct ibv_device **device_list = nullptr;
     int dev_num;
     bool found_device = false;
     device_list = ibv_get_device_list(&dev_num);
+    //std::cout << "get device" << std::endl;
+    LOG(INFO) << "get device! device num: " << dev_num;
     if (!device_list) {
         LOG(ERROR) << "ibv_get_device_list() failed!";
         return -1;
@@ -60,6 +69,7 @@ int htn_context:: InitDevice() {
             break;
         }
     }
+    //LOG(INFO) << "stage 1";
     if (!found_device) {
         LOG(ERROR) << "Device" << device_name_ << "not found!";
     }
@@ -68,6 +78,7 @@ int htn_context:: InitDevice() {
         LOG(ERROR) << "cannot open device";
         return -1;
     }
+    //LOG(INFO) << "stage 2";
     int num_of_qps = InitIds();
     endpoints_.resize(num_of_qps, nullptr);
     struct ibv_port_attr port_attr;
@@ -78,6 +89,7 @@ int htn_context:: InitDevice() {
     lid_ = port_attr.lid;
     // sl_ = port_attr.sm_sl;
     port_ = FLAGS_port;
+    LOG(INFO) << "exit InitDevice!";
     return 0;
 }
 
@@ -103,21 +115,29 @@ int htn_context::InitMemory() {
         }
         pds_.push_back(pd);
     }
+    LOG(INFO) << "Finish PD generation!";
     int buffer_size = FLAGS_buf_size;
+    LOG(INFO) << "buffer_size: " << buffer_size;
     for (int i = 0; i < total_mr_num_; i++) {
-        htn_region* region = new htn_region(pds_[i], buffer_size, FLAGS_buf_num, false, 0);
+        LOG(INFO) << "total_mr_num_: " << total_mr_num_ << "; i: " << i;
+        //htn_region* region = new htn_region(pds_[i], buffer_size, FLAGS_buf_num, false, 0);
+        htn_region* region = new htn_region(pds_[0], buffer_size, FLAGS_buf_num, false, 0); // todo: multiple PD
         if (region->Mallocate()) {
             LOG(ERROR) << "Region Memory allocation failed";
             break;
         }
+        LOG(INFO) << "Send memory region allocated!";
         send_mempool_.push_back(region);
-        region = new htn_region(pds_[i], buffer_size, FLAGS_buf_num, false, 0);
+        //region = new htn_region(pds_[i], buffer_size, FLAGS_buf_num, false, 0);
+        region = new htn_region(pds_[0], buffer_size, FLAGS_buf_num, false, 0);
         if (region->Mallocate()) {
             LOG(ERROR) << "Region Memory allocation failed";
             break;
         }
         recv_mempool_.push_back(region);
+        LOG(INFO) << "Receive memory region allocated!";
     }
+    LOG(INFO) << "Finish MR Generation!";
 
     // Allocate CQ
     int cqn = num_of_hosts_ * num_qp_per_host_;
@@ -625,6 +645,7 @@ std::string htn_context::GidToIP(const union ibv_gid &gid) {
     std::string ip =
         std::to_string(gid.raw[12]) + "." + std::to_string(gid.raw[13]) + "." +
         std::to_string(gid.raw[14]) + "." + std::to_string(gid.raw[15]);
+    LOG(INFO) << "IP: " << ip;
     return ip;
 }
 

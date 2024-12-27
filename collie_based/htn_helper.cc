@@ -41,10 +41,12 @@ DEFINE_int32(buf_num, 1, "The number of buffers owned by one QP");
 namespace Htn {
 
 int Initialize(int argc, char **argv) {
+    std::cout << "initialize" << std::endl;
     google::InitGoogleLogging(argv[0]);
     FLAGS_logtostderr = 1;
     // parse parameters into FLAGS_<DECLARE_xxx>
     gflags::ParseCommandLineFlags(&argc, &argv, true);
+    std::cout << "initialize finish!" << std::endl;
     return 0;
 }
 
@@ -155,6 +157,20 @@ std::vector<std::string> ParseHost(std::string host_ip) {
         result.push_back(substr);
     }
     return result;
+}
+
+// get current time in microsecond
+uint64_t Now64() {
+    struct timespec tv;
+    int res = clock_gettime(CLOCK_REALTIME, &tv);
+    return (uint64_t)tv.tv_sec * 1000000llu + (uint64_t)tv.tv_nsec / 1000;
+}
+
+// get current time in nanosecond
+uint64_t Now64Ns() {
+    struct timespec tv;
+    int res = clock_gettime(CLOCK_REALTIME, &tv);
+    return (uint64_t)tv.tv_sec * 1000000000llu + (uint64_t)tv.tv_nsec;
 }
 
 }

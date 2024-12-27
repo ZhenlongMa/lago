@@ -19,7 +19,8 @@
 // #include <stdlib>
 #include <string>
 #include <netdb.h>
-#include<queue>
+#include <queue>
+#include <iostream>
 
 // #include "htn_context.hh"
 
@@ -97,4 +98,7 @@ struct ibv_qp_init_attr MakeQpInitAttr(struct ibv_cq *send_cq,
                                        struct ibv_cq *recv_cq,
                                        int send_wq_depth, int recv_wq_depth);
 }
+
+uint64_t Now64();
+uint64_t Now64Ns();
 #endif

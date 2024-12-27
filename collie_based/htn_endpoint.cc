@@ -6,7 +6,6 @@
 // See LICENSE for license information
 
 #include "htn_endpoint.hh"
-
 #include "htn_context.hh"
 
 namespace Htn {
@@ -33,6 +32,8 @@ int htn_endpoint::PostSend(std::vector<htn_region *> &mem_pool, test_qp qp_case,
         sge.addr = mem_pool[0]->buffers_.front()->addr_;
         sge.lkey = mem_pool[0]->buffers_.front()->local_key_;
         sge.length = qp_case.data_size;
+        bytes_sent_now_ += sge.length;
+        msgs_sent_now_++;
         if (finish_wr_num < qp_case.write_num) {
             wr_list[i].opcode = IBV_WR_RDMA_WRITE;
         }
@@ -71,7 +72,6 @@ int htn_endpoint::PostSend(std::vector<htn_region *> &mem_pool, test_qp qp_case,
         wr_list[i].wr_id = (uint64_t)this;
         wr_list[i].sg_list = &sge;
         wr_list[i].next = (i == batch_size - 1) ? nullptr : &wr_list[i + 1];
-        msgs_sent_now_++;
     }
     struct ibv_send_wr *bad_wr = nullptr;
     if (ibv_post_send(qp_, wr_list, &bad_wr)) {
