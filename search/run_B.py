@@ -1,29 +1,29 @@
-# Run this Python script in 10.5.200.186 (computer 05)
+# Run this Python script in 10.18.133.28 (node28)
 import os
 import time
 import re
 import atexit
 
 case_file = "../collie_based/test_case_demo"
-EINGINE_PATH = "/home/mazhenl/shared/rnic_test/collie_based/test_engine"
-user = "mazhenl"
+EINGINE_PATH = "/work/mazhenlong/rnic_test/collie_based/test_engine"
+user = "root"
 node_list = ["10.5.200.186", "10.5.200.187"]
-SERVER_IP = "10.5.200.186"
-CLIENT_IP = "10.5.200.187"
+SERVER_IP = "192.168.0.23"
+CLIENT_IP = "92.168.0.25"
 dev = "mlx5_0"
 OBJ_DIR = "/home/mazhenl/shared/rnic_test/search"
 
 def start_test():
     # launch server
     server_parameter = "--server --dev=mlx5_0"
-    cmd = EINGINE_PATH + " " + server_parameter
+    cmd = EINGINE_PATH + " " + server_parameter + " > " + OBJ_DIR + "/server_log &"
     print(cmd)
     rtn = os.system(cmd)
     if (rtn != 0):
         raise Exception("Error for cmd!")
     # launch client
     client_parameter = "--connect=10.5.200.186 --dev=mlx5_0"
-    cmd = "ssh " + user + "@" + CLIENT_IP + " '" + EINGINE_PATH + " " + client_parameter + "'" 
+    cmd = "ssh " + user + "@" + CLIENT_IP + " '" + EINGINE_PATH + " " + client_parameter + " > " + OBJ_DIR + "/client_log &'&" 
     print(cmd)
     rtn = os.system(cmd)
     if (rtn != 0):
