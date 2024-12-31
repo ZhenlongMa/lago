@@ -12,7 +12,7 @@
 // Communication Configuration
 DEFINE_string(dev, "mlx5_0", "RDMA NIC device name");
 DEFINE_int32(gid, 3, "GID of the RDMA NIC");
-DEFINE_int32(port, 1234, "port number used for TCP");
+DEFINE_int32(port, 2345, "port number used for TCP");
 
 DEFINE_bool(server, false, "is server");
 DEFINE_string(connect_ip, "", "IP address of the server");
@@ -41,12 +41,22 @@ DEFINE_int32(buf_num, 1, "The number of buffers owned by one QP");
 namespace Htn {
 
 int Initialize(int argc, char **argv) {
-    std::cout << "initialize" << std::endl;
     google::InitGoogleLogging(argv[0]);
-    FLAGS_logtostderr = 1;
+    // google::SetLogDestination(0, "../log/");
+    FLAGS_logtostderr = true;
     // parse parameters into FLAGS_<DECLARE_xxx>
     gflags::ParseCommandLineFlags(&argc, &argv, true);
-    std::cout << "initialize finish!" << std::endl;
+    FLAGS_logbufsecs = 0;
+    if (FLAGS_server) {
+        google::SetLogDestination(0, "../server_log/server_info");
+        google::SetLogDestination(google::ERROR, "../server_log/server_error");
+    }
+    else {
+        google::SetLogDestination(0, "../client_log/client_info");
+        google::SetLogDestination(google::ERROR, "../client_log/client_error");
+    }
+    LOG(INFO) << "initialize finish!";
+    // LOG(ERROR) << "TRY ERROR!";
     return 0;
 }
 

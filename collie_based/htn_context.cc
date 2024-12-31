@@ -10,7 +10,7 @@
 namespace Htn {
 
 int htn_context::Init() {
-    std::cout << "context init!" << std::endl;
+    LOG(INFO) << "context init!";
     // file format: 
     // service_type write_num read_num send_recv_num mr_num sg_num data_size
     std::ifstream test_file("test_case_demo");
@@ -29,7 +29,7 @@ int htn_context::Init() {
         test_case.push_back(test);
     }
     num_qp_per_host_ = test_case.size();
-    std::cout << "test case ready!" << std::endl;
+    LOG(INFO) << "test case ready!";
     if (InitDevice() < 0) {
         LOG(ERROR) << "InitDevice() failed";
         return -1;
@@ -56,7 +56,7 @@ int htn_context:: InitDevice() {
     int dev_num;
     bool found_device = false;
     device_list = ibv_get_device_list(&dev_num);
-    //std::cout << "get device" << std::endl;
+    std::cout << "get device" << std::endl;
     LOG(INFO) << "get device! device num: " << dev_num;
     if (!device_list) {
         LOG(ERROR) << "ibv_get_device_list() failed!";
