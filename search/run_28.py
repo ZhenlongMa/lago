@@ -7,7 +7,6 @@ import atexit
 case_file = "../collie_based/test_case_demo"
 EINGINE_PATH = "/work/mazhenlong/rnic_test/collie_based/test_engine"
 user = "root"
-node_list = ["10.5.200.186", "10.5.200.187"]
 SERVER_IP = "192.168.0.23"
 CLIENT_IP = "192.168.0.25"
 dev = "mlx5_0"

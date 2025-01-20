@@ -1,0 +1,19 @@
+I0108 21:36:27.107213 22860 htn_helper.cc:58] initialize finish!
+I0108 21:36:27.107311 22860 htn_main.cc:21] enter server!
+I0108 21:36:27.107324 22860 htn_context.cc:13] context init!
+I0108 21:36:27.107756 22860 htn_context.cc:32] test case ready!
+I0108 21:36:27.107781 22860 htn_context.cc:53] enter InitDevice!
+get device
+I0108 21:36:27.110507 22860 htn_context.cc:60] get device! device num: 2
+I0108 21:36:27.132264 22860 htn_context.cc:92] exit InitDevice!
+I0108 21:36:27.132290 22860 htn_context.cc:37] Finish InitDevice!
+I0108 21:36:27.132401 22860 htn_context.cc:118] Finish PD generation!
+I0108 21:36:27.132412 22860 htn_context.cc:120] buffer_size: 65536
+I0108 21:36:27.132421 22860 htn_context.cc:140] Finish MR Generation!
+I0108 21:36:27.132427 22860 htn_context.cc:42] Finish InitMemory!
+I0108 21:36:27.132436 22860 htn_context.cc:47] Finish InitTransport!
+cout: server init finish!
+I0108 21:36:27.132452 22860 htn_main.cc:27] server init finish!
+I0108 21:36:27.132812 22861 htn_context.cc:222] About to listen on port 2345
+I0108 21:36:27.132839 22861 htn_context.cc:229] Server listen thread starts
+E0108 21:36:27.189806 22865 htn_context.cc:277] The number of qp should be positive! number of qp: 0 number of mem: 1

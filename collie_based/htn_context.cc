@@ -220,7 +220,8 @@ int htn_context::Listen() {
         return -1;
     }
     LOG(INFO) << "About to listen on port " << port_;
-    err = listen(sockfd, 1024);
+    // err = listen(sockfd, 1024);
+    err = listen(sockfd, port_);
     if (err) {
         PLOG(ERROR) << "listen() failed";
         return -1;
@@ -273,7 +274,8 @@ int htn_context::AcceptHandler(int connfd) {
     number_of_qp = (info->info.host.number_of_qp);
     number_of_mem = (info->info.host.number_of_mem);
     if (number_of_qp <= 0) {
-        LOG(ERROR) << "The number of qp should be positive";
+        LOG(ERROR) << "The number of qp should be positive! number of qp: " << number_of_qp
+            << " number of mem: " << number_of_mem;
         goto out;
     }
 
@@ -453,10 +455,10 @@ void htn_context::GetEndpointInfo(htn_endpoint *endpoint,
 int htn_context::Connect(const char *server, int port, int connid) {
     int sockfd = -1;
     for (int i = 0; i < kMaxConnRetry; i++) {
+        LOG(INFO) << "Try connect to " << server << ":" << port << " for "
+                << i + 1 << " times...";
         sockfd = ConnectionSetup(server, port);
         if (sockfd > 0) break;
-        LOG(INFO) << "Try connect to " << server << ":" << port << " failed for "
-                << i + 1 << " times...";
         sleep(1);
     }
     if (sockfd < 0) return -1;
@@ -476,6 +478,8 @@ int htn_context::Connect(const char *server, int port, int connid) {
     info->info.host.number_of_qp = (num_qp_per_host_);
     info->info.host.number_of_mem = (FLAGS_buf_num);
     memcpy(&info->info.host.gid, &local_gid_, sizeof(union ibv_gid));
+    LOG(INFO) << "Client sent: number of qp: " << info->info.host.number_of_qp
+        << " number of mem: " << info->info.host.number_of_mem;
     if (write(sockfd, conn_buf, sizeof(connect_info)) != sizeof(connect_info)) {
         LOG(ERROR) << "Couldn't send local address";
         n = -1;
@@ -483,7 +487,7 @@ int htn_context::Connect(const char *server, int port, int connid) {
     }
     n = read(sockfd, conn_buf, sizeof(connect_info));
     if (n != sizeof(connect_info)) {
-        PLOG(ERROR) << "client read";
+        PLOG(ERROR) << "client read n: " << n;
         LOG(ERROR) << "Read only " << n << "/" << sizeof(connect_info) << " bytes";
         goto out;
     }

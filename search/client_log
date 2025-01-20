@@ -1,0 +1,26 @@
+I0108 21:47:58.552768  1093 htn_helper.cc:58] initialize finish!
+I0108 21:47:58.552877  1093 htn_main.cc:33] enter client!
+cout enter client!
+I0108 21:47:58.553467  1093 htn_main.cc:36] parse host finish!
+I0108 21:47:58.553498  1093 htn_context.cc:13] context init!
+I0108 21:47:58.553927  1093 htn_context.cc:32] test case ready!
+I0108 21:47:58.553954  1093 htn_context.cc:53] enter InitDevice!
+libibverbs: Warning: couldn't load driver 'libcxgb3-rdmav34.so': libcxgb3-rdmav34.so: cannot open shared object file: No such file or directory
+libibverbs: Warning: couldn't load driver 'libnes-rdmav34.so': libnes-rdmav34.so: cannot open shared object file: No such file or directory
+libibverbs: Warning: couldn't load driver 'libi40iw-rdmav34.so': libi40iw-rdmav34.so: cannot open shared object file: No such file or directory
+libibverbs: Warning: couldn't load driver 'libhgrnic-rdmav34.so': libhgrnic-rdmav34.so: cannot open shared object file: No such file or directory
+get device
+I0108 21:47:58.557042  1093 htn_context.cc:60] get device! device num: 2
+I0108 21:47:58.584108  1093 htn_context.cc:92] exit InitDevice!
+I0108 21:47:58.584138  1093 htn_context.cc:37] Finish InitDevice!
+I0108 21:47:58.584264  1093 htn_context.cc:118] Finish PD generation!
+I0108 21:47:58.584275  1093 htn_context.cc:120] buffer_size: 65536
+I0108 21:47:58.584282  1093 htn_context.cc:140] Finish MR Generation!
+I0108 21:47:58.584290  1093 htn_context.cc:42] Finish InitMemory!
+I0108 21:47:58.584298  1093 htn_context.cc:47] Finish InitTransport!
+I0108 21:47:58.584308  1093 htn_main.cc:42] client initialization finish!
+I0108 21:47:58.584317  1093 htn_context.cc:458] Try connect to 192.168.0.23:2345 for 1 times...
+I0108 21:47:58.584602  1093 htn_context.cc:481] Client sent: number of qp: 0number of mem: 1
+E0108 21:47:58.584998  1093 htn_context.cc:490] client read n: 0: No space left on device [28]
+E0108 21:47:58.585028  1093 htn_context.cc:491] Read only 0/32 bytes
+E0108 21:47:58.585054  1093 htn_main.cc:45] Client connect failed!
