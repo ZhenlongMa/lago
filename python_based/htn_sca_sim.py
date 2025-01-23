@@ -56,25 +56,25 @@ def parse_file(file_name, msg_sz):
 
 def stop(machine_list):
     print("Cleaning processes...")
-    cleanup_commands = [
-        f"ssh {USER}@{node} 'netstat -t -p > {OBJ_DIR}/tmp.log'" for node in machine_list
-    ] + [
-        f"ssh {USER}@{node} 'ps -aux > {OBJ_DIR}/tmp.log'" for node in machine_list
-    ]
-
-    for cmd in cleanup_commands:
+    for node in machine_list:
+        cmd = f"ssh {USER}@{node} 'ps -aux > {OBJ_DIR}/tmp.log'"
         print(cmd)
-        os.system(cmd)
-        with open(f"{OBJ_DIR}/tmp.log", "r", encoding="utf-8") as f:
-            for line in f:
-                match = re.search(r"\b(\d+)/" + TEST_TYPE, line)
-                if match:
-                    kill_cmd = f"ssh {USER}@{node} 'kill -9 {match.group(1)}'"
+        rtn = os.system(cmd)
+        if rtn != 0:
+            raise Exception("\033[0;31;40mError for cmd \033[0m")
+        with open(OBJ_DIR + "/tmp.log", "r", encoding ="utf-8") as f:
+            for line in f.readlines():
+                line = line.strip()
+                is_match = re.findall(r"(ib_write_bw)|(ib_write_lat)|(ib_read_bw)|(ib_read_lat)", line)
+                if is_match != []:
+                    line_list = line.split()
+                    pid_num = line_list[1].strip()
+                    kill_cmd = "ssh {USER}@{node} 'kill -9 {pid_num}'"
                     print(kill_cmd)
                     os.system(kill_cmd)
-        os.remove(f"{OBJ_DIR}/tmp.log")
+        os.system("rm -rf " + OBJ_DIR + "/tmp.log")
         time.sleep(3)
-    print("Processes cleaned!")
+    print("process cleaned!")
 
 def bw_test(qp_num, msg_sz):
     print("Starting bandwidth test...")

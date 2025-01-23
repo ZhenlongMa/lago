@@ -79,25 +79,6 @@ def parse_file(file_name, msg_sz):
         return (sum(res) / len(res))
 
 def stop(machine_list):
-    print("clean process by netstat!")
-    for node in machine_list:
-        cmd = "ssh mazhenl@" + node + " 'netstat -t -p > " + OBJ_DIR + "/tmp.log'"
-        print(cmd)
-        rtn = os.system(cmd)
-        if rtn != 0:
-            raise Exception("\033[0;31;40mError for cmd \033[0m")
-        with open(OBJ_DIR + "/tmp.log", "r", encoding ="utf-8") as f:
-            for line in f.readlines():
-                line = line.strip()
-                str_list = line.split(' ')
-                # print(str_list)
-                res = re.findall(r"(.+?)/"+TEST_TYPE, str_list[-1])
-                if res != []:
-                    print(res)
-                    print("ssh mazhenl@" + node + " 'kill -9 " + res[0] + "'")
-                    os.system("ssh mazhenl@" + node + " 'kill -9 " + res[0] + "'")
-        os.system("rm -rf " + OBJ_DIR + "/tmp.log")
-        time.sleep(3)
     print("clean process by ps!")
     for node in machine_list:
         cmd = "ssh mazhenl@" + node + " 'ps -aux > " + OBJ_DIR + "/tmp.log'"
