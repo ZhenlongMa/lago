@@ -5,13 +5,13 @@ import re
 import atexit
 
 case_file = "../collie_based/test_case_demo"
-EINGINE_PATH = "/home/mazhenl/shared/rnic_test/collie_based/test_engine"
+EINGINE_PATH = "/home/mazhenl/shared/rnic_test/collie_based/engine/test_engine"
 user = "mazhenl"
 node_list = ["10.5.200.186", "10.5.200.187"]
 SERVER_IP = "10.5.200.186"
 CLIENT_IP = "10.5.200.187"
 dev = "mlx5_0"
-OBJ_DIR = "/home/mazhenl/shared/rnic_test/search"
+OBJ_DIR = "/home/mazhenl/shared/rnic_test/collie_based/search"
 
 def start_test():
     # launch server
