@@ -47,14 +47,14 @@ int Initialize(int argc, char **argv) {
     // parse parameters into FLAGS_<DECLARE_xxx>
     gflags::ParseCommandLineFlags(&argc, &argv, true);
     FLAGS_logbufsecs = 0;
-    if (FLAGS_server) {
-        google::SetLogDestination(0, "../server_log/server_info");
-        google::SetLogDestination(google::ERROR, "../server_log/server_error");
-    }
-    else {
-        google::SetLogDestination(0, "../client_log/client_info");
-        google::SetLogDestination(google::ERROR, "../client_log/client_error");
-    }
+    // if (FLAGS_server) {
+    //     google::SetLogDestination(0, "../server_log/server_info");
+    //     google::SetLogDestination(google::ERROR, "../server_log/server_error");
+    // }
+    // else {
+    //     google::SetLogDestination(0, "../client_log/client_info");
+    //     google::SetLogDestination(google::ERROR, "../client_log/client_error");
+    // }
     LOG(INFO) << "initialize finish!";
     // LOG(ERROR) << "TRY ERROR!";
     return 0;
