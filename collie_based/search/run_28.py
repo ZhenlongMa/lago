@@ -4,13 +4,13 @@ import time
 import re
 import atexit
 
-case_file = "../collie_based/test_case_demo"
-EINGINE_PATH = "/work/mazhenlong/rnic_test/collie_based/test_engine"
+case_file = "../collie_based/engine/test_case_demo"
+EINGINE_PATH = "/work/mazhenlong/rnic_test/collie_based/engine/test_engine"
 user = "root"
 SERVER_IP = "192.168.0.23"
 CLIENT_IP = "192.168.0.25"
 dev = "mlx5_0"
-OBJ_DIR = "/work/mazhenlong/rnic_test/search"
+OBJ_DIR = "/work/mazhenlong/rnic_test/collie_based/search"
 
 def start_test():
     if 1:
