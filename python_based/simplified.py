@@ -3,6 +3,7 @@ import time
 import re
 import atexit
 
+
 OBJ_DIR = "/home/mazhenl/shared/rnic_test/simple_script"
 
 # Communication parameters
