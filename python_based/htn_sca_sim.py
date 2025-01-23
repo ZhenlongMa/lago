@@ -3,7 +3,6 @@ import time
 import re
 import atexit
 
-
 OBJ_DIR = "/home/mazhenl/shared/rnic_test/simple_script"
 
 # Communication parameters
@@ -12,6 +11,7 @@ MSG_SZ = 64
 WQE_NUM = 100
 MTU = 4096
 GID_INDEX = "0"
+USER = "mazhenl"
 
 # Hosts and devices
 SERVERS = ["10.5.200.186"] * 4
@@ -39,9 +39,10 @@ def start_test(qp_num, msg_sz):
     commands = []
     for i in range(4):
         svr_cmd = generate_command(TEST_TYPE, qp_num, msg_sz, 12331 + i, DEVICES[i])
+        commands.append(f"ssh {USER}@{SERVERS[i]} 'cd {OBJ_DIR} && {svr_cmd} > test_result_s{i + 1} &'")
+    for i in range(4):
         clt_cmd = generate_command(TEST_TYPE, qp_num, msg_sz, 12331 + i, DEVICES[i + 4], SERVERS[i])
-        commands.append(f"ssh mazhenl@{SERVERS[i]} 'cd {OBJ_DIR} && {svr_cmd} > test_result_s{i + 1} &'")
-        commands.append(f"ssh mazhenl@{CLIENTS[i]} 'cd {OBJ_DIR} && {clt_cmd} > test_result_c{i + 1} &'")
+        commands.append(f"ssh {USER}@{CLIENTS[i]} 'cd {OBJ_DIR} && {clt_cmd} > test_result_c{i + 1} &'")
     execute_commands(commands)
 
 def parse_file(file_name, msg_sz):
@@ -56,9 +57,9 @@ def parse_file(file_name, msg_sz):
 def stop(machine_list):
     print("Cleaning processes...")
     cleanup_commands = [
-        f"ssh mazhenl@{node} 'netstat -t -p > {OBJ_DIR}/tmp.log'" for node in machine_list
+        f"ssh {USER}@{node} 'netstat -t -p > {OBJ_DIR}/tmp.log'" for node in machine_list
     ] + [
-        f"ssh mazhenl@{node} 'ps -aux > {OBJ_DIR}/tmp.log'" for node in machine_list
+        f"ssh {USER}@{node} 'ps -aux > {OBJ_DIR}/tmp.log'" for node in machine_list
     ]
 
     for cmd in cleanup_commands:
@@ -68,7 +69,7 @@ def stop(machine_list):
             for line in f:
                 match = re.search(r"\b(\d+)/" + TEST_TYPE, line)
                 if match:
-                    kill_cmd = f"ssh mazhenl@{node} 'kill -9 {match.group(1)}'"
+                    kill_cmd = f"ssh {USER}@{node} 'kill -9 {match.group(1)}'"
                     print(kill_cmd)
                     os.system(kill_cmd)
         os.remove(f"{OBJ_DIR}/tmp.log")
