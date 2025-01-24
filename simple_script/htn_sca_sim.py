@@ -3,7 +3,8 @@ import time
 import re
 import atexit
 
-OBJ_DIR = "/home/mazhenl/shared/rnic_test/simple_script"
+# OBJ_DIR = "/home/mazhenl/shared/rnic_test/simple_script" # for DPU platform
+OBJ_DIR = "/work/mazhenlong/rnic_test/python_based" # for 23/25 platform
 
 # Communication parameters
 TEST_TYPE = "ib_write_bw"
@@ -11,7 +12,8 @@ MSG_SZ = 64
 WQE_NUM = 100
 MTU = 4096
 GID_INDEX = "0"
-USER = "mazhenl"
+# USER = "mazhenl" # for DPU platform
+USER = "root" # for 23/25 platform
 
 # Hosts and devices
 SERVERS = ["10.5.200.186"] * 4
@@ -54,7 +56,7 @@ def parse_file(file_name, msg_sz):
                 res.append(float(line_list[-1]))
     return sum(res) / len(res) if res else 0
 
-def stop(machine_list):
+def stop_perftest(machine_list):
     print("Cleaning processes...")
     for node in machine_list:
         cmd = f"ssh {USER}@{node} 'ps -aux > {OBJ_DIR}/tmp.log'"
@@ -81,8 +83,9 @@ def bw_test(qp_num, msg_sz):
     machine_list = SERVERS + CLIENTS
     start_test(qp_num, msg_sz)
     time.sleep(10)
-    stop(machine_list)
-    total_msg_rate = sum(parse_file(f"test_result_c{i + 1}", msg_sz) for i in range(4))
+    stop_perftest(machine_list)
+    for i in range(4):
+        total_msg_rate = sum(parse_file(f"test_result_c{i + 1}", msg_sz))
     print(f"Msg rate for {qp_num} QPs is {total_msg_rate} op/s")
     print(f"Throughput for {qp_num} QPs is {total_msg_rate * msg_sz * 8 / 1_000} Gbit/s")
     return total_msg_rate
@@ -100,5 +103,5 @@ def main():
     print("".join(results))
 
 if __name__ == "__main__":
-    atexit.register(lambda: stop(SERVERS + CLIENTS))
+    atexit.register(lambda: stop_perftest(SERVERS + CLIENTS))
     main()
