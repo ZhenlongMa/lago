@@ -3,14 +3,14 @@ import time
 import re
 import atexit
 import test_config as tc
-
-# Function: generate first case
-def init_case():
-    config = tc.test_config()
-    
+import decider
+import case_driver
 
 def main():
-    init_case()
+    config = tc.test_config()
+    config.init_case()
+    drv = case_driver.case_driver()
+    dc = decider.decider()
 
 if __name__ == "__main__":
     main()
