@@ -8,6 +8,8 @@ class test_config:
 
     case_param = []
 
+    size_list = [64, 256, 1024, 4096, 16384, 65536, 1048576]
+
     class param:
         def __init__(self, qp_num: int, service_type: str, op:str, msg_size:int, sharing_mr: bool):
             self.qp_num = qp_num
@@ -16,7 +18,14 @@ class test_config:
             self.msg_size = msg_size
             self.sharing_mr = sharing_mr
 
+    class destination:
+        def __init__(self):
+            self.msg_size = 1048576
+            self.qp_num = 64 # total QP number
+
     def __init__(self, platform):
+        self.round_num = 5 # test for five rounds
+        self.dst = self.destination()
         self.process_num = 0
         if platform == "DPU":
             self.object_directory = "/home/mazhenl/shared/rnic_test/python_based" # for DPU platform
