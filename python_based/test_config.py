@@ -43,6 +43,8 @@ class test_config:
             self.server_devices = ["mlx5_0"] * 8  # First 4 are servers, last 4 are clients
             self.client_devices = ["mlx5_0"] * 8
 
+            self.peak_bdp = 100 # Gbps
+
         elif platform == "28":
             self.object_directory = "/work/mazhenlong/rnic_test/python_based" # for 23/25 platform
 
@@ -58,6 +60,8 @@ class test_config:
             self.clients = ["192.168.0.25"] * 4 # for 23/25 platform
             self.server_devices = ["mlx5_0"] * 8  # First 4 are servers, last 4 are clients
             self.client_devices = ["mlx5_0"] * 8
+
+            self.peak_bdp = 100 # Gbps
         else:
             raise Exception(f"Illegal platform! {platform}")
     
@@ -65,3 +69,7 @@ class test_config:
         self.case_param_vector = ["1 1 1 64 0"]
         test_param = self.param(1, "RC", "WRITE", 64, True)
         self.case_param.append(test_param)
+
+    # generate the boundary of the test and save as a case
+    def generate_terminus(self):
+        process_num = 7
