@@ -12,11 +12,11 @@ class analyzer:
         # clculate throughput
 
         # map case to throughput
-        a = 0
+        # todo
 
     def judge_anomaly(self):
-        a = 0
+        # todo
 
     # calculate case 1 - case 2
     def diff_case(self, case1, case2):
-        a = 0
+        # todo

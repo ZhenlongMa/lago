@@ -1,3 +1,5 @@
+import test_case
+
 class test_config:
     process_num = 0
     # case parameter format (with n processes):
@@ -71,5 +73,10 @@ class test_config:
         self.case_param.append(test_param)
 
     # generate the boundary of the test and save as a case
+    # todo: change this version to be more heterogeneous
     def generate_terminus(self):
-        process_num = 7
+        terminus_process_num = 7
+        self.terminus = test_case.test_case()
+        for i in range(terminus_process_num):
+            param = self.terminus.process_param(4, "RC", "WRITE", 65536, True)
+            self.terminus.case.append(param)
