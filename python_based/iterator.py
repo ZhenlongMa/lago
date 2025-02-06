@@ -24,6 +24,9 @@ class iterator:
         start_case = test_case.test_case()
         start_process_num = 1
         # to do: generate the start case
+        for i in range(start_process_num):
+            param = start_case.process_param(1, "RC", "WRITE", 64, False)
+            start_case.case.append(param)
         return start_case
 
     # set the next case to run according to the current case, the original case, the final case, 
@@ -31,8 +34,9 @@ class iterator:
     def set_next_case(self, current_case, original_case, final_case):
         next_case = test_case.test_case()
         # todo: generate the next case
+        
         return next_case
 
     # test peak performance of each kind of instance, and record the result in recorder
-    def test_norm(self):
+    # def test_norm(self):
         # todo
