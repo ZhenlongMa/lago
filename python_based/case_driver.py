@@ -66,7 +66,6 @@ class case_driver:
 
     # def norm_test(self, norm_config):
 
-
 if __name__ == "__main__":
     atexit.register(lambda: case_driver.stop_perftest(SERVERS + CLIENTS))
     main()

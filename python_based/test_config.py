@@ -29,6 +29,7 @@ class test_config:
         self.round_num = 5 # test for five rounds
         self.dst = self.destination()
         self.process_num = 0
+        self.generate_terminus()
         if platform == "DPU":
             self.object_directory = "/home/mazhenl/shared/rnic_test/python_based" # for DPU platform
 
