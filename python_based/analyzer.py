@@ -7,14 +7,25 @@ class analyzer:
 
     # calculate the throughput of the current case.
     # the input is the case
-    def calculate_throughput(self):
-        # read test result file
+    def calculate_throughput(self, case):
+        total_qp_num = 0
+        self.pps_vec = []
+        self.bps_vec = []
+        for i in range(case.param.size()):
+            if case.param[i].qp_num != 0:
+                msg_rate = self.parse_file_msg_rate(f"test_result_c{i}")
+                self.msg_rate_vec.append(msg_rate)
+                self.bps_vec.append(msg_rate * (case.param[i].msg_size + 64)) # unit: Mbps
+                total_qp_num += case.param[i].qp_num
+            else:
+                self.pps_vec.append(0)
+                self.bps_vec.append(0)
 
-        # calculate bdp and expected bdp
+        # calculate bps and expected bps, generate a CDF
 
-        # clculate throughput
+        # calculate the throughput
 
-        # map case to throughput
+        # map the throughput to the case
         # todo
 
     def judge_anomaly(self):
@@ -28,10 +39,17 @@ class analyzer:
             return False
         else:
             for i in range(case1.process_num):
+                if case1.param[i].qp_num < case2.param[i].qp_num:
+                    return False
+                if case1.param[i].msg_size < case2.param[i].msg_size:
+                    return False
+                if case1.param[i].sharing_mr == False and case2.param[i].sharing_mr == True:
+                    return False
+        return True
 
-
-    def parse_file(file_name, msg_sz):
-        res = []
+    # calculate the message rate
+    def parse_file_msg_rate(file_name, msg_sz):
+        res = [] 
         with open(file_name, "r", encoding="utf-8") as f:
             for line in f.readlines():
                 line = line.strip()

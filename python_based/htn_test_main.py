@@ -14,9 +14,9 @@ def main():
     drv = case_driver.case_driver(config)
     it = iterator.iterator(config, drv, analyzer)
     print("begin test!")
+    atexit.register(lambda: case_driver.stop_perftest(SERVERS + CLIENTS))
     it.launch_test()
     print("end test!")
 
 if __name__ == "__main__":
-    atexit.register(lambda: case_driver.stop_perftest(SERVERS + CLIENTS))
     main()

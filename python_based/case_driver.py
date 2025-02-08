@@ -49,23 +49,23 @@ class case_driver:
                 raise Exception(f"\033[0;31;40mError for cmd {cmd}\033[0m")
             time.sleep(0.1)
     
-    def start_test(self):
+    def start_test(self, case):
+        # todo: consider qp_num equals zero
+        # todo: case as input
         commands = []
         process_num = self.test_config.case_param.size()
         for i in range(process_num):
+            if case.case[i].qp_num == 0:
+                continue
             svr_cmd = self.generate_command(self.test_config.test_type, self.test_config.case_param[i].qp_num, \
                                             self.test_config.case_param[i].msg_sz, 12331 + i, self.test_config.server_devices[0])
             commands.append(f"ssh {self.test_config.user}@{self.test_config.servers[i]} \
                             'cd {self.test_config.object_directory} && {svr_cmd} > test_result_s{i + 1} &'&")
         for i in range(process_num):
+            if case.case[i].qp_num == 0:
+                continue
             clt_cmd = self.generate_command(self.test_config.test_type, self.test_config.case_param[i].qp_num, \
                                             self.test_config.case_param[i].msg_sz, 12331 + i, self.test_config.client_devices[0], self.test_config.servers[i])
             commands.append(f"ssh {self.test_config.user}@{self.test_config.clients[i]} \
                             'cd {self.test_config.object_directory} && {clt_cmd} > test_result_c{i + 1} &'&")
         self.execute_commands(commands)
-
-    # def norm_test(self, norm_config):
-
-if __name__ == "__main__":
-    atexit.register(lambda: case_driver.stop_perftest(SERVERS + CLIENTS))
-    main()
