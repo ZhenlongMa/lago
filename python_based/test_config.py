@@ -68,10 +68,10 @@ class test_config:
         else:
             raise Exception(f"Illegal platform! {platform}")
     
-    def generate_init_case(self):
-        self.case_param_vector = ["1 1 1 64 0"]
-        test_param = self.param(1, "RC", "WRITE", 64, True)
-        self.case_param.append(test_param)
+    # def generate_init_case(self):
+    #     self.case_param_vector = ["1 1 1 64 0"]
+    #     test_param = self.param(1, "RC", "WRITE", 64, True)
+    #     self.case_param.append(test_param)
 
     # generate the boundary of the test and save as a case
     # todo: change this version to be more heterogeneous
@@ -80,4 +80,4 @@ class test_config:
         self.terminus = test_case.test_case()
         for i in range(terminus_process_num):
             param = self.terminus.process_param(4, "RC", "WRITE", 65536, True)
-            self.terminus.case.append(param)
+            self.terminus.param.append(param)

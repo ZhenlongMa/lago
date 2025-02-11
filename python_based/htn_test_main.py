@@ -9,12 +9,12 @@ import analyzer
 
 def main():
     config = tc.test_config("28")
-    config.init_case()
-    analyzer = analyzer.analyzer(config)
+    # config.init_case()
+    performance_analyzer = analyzer.analyzer(config)
     drv = case_driver.case_driver(config)
-    it = iterator.iterator(config, drv, analyzer)
+    it = iterator.iterator(config, drv, performance_analyzer)
     print("begin test!")
-    atexit.register(lambda: case_driver.stop_perftest(SERVERS + CLIENTS))
+    atexit.register(drv.stop_test)
     it.launch_test()
     print("end test!")
 

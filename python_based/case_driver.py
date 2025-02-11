@@ -10,8 +10,9 @@ class case_driver:
         self.test_config = test_config
         self.test_time = 10 # seconds
 
-    def stop_perftest(self, machine_list):
+    def stop_test(self):
         print("Cleaning perftest processes...")
+        machine_list = [self.test_config.servers[0], self.test_config.clients[0]]
         for node in machine_list:
             cmd = f"ssh {self.test_config.user}@{node} 'ps -aux > {self.test_config.object_directory}/tmp.log'"
             print(cmd)
@@ -53,19 +54,19 @@ class case_driver:
         # todo: consider qp_num equals zero
         # todo: case as input
         commands = []
-        process_num = self.test_config.case_param.size()
+        process_num = len(case.param)
         for i in range(process_num):
-            if case.case[i].qp_num == 0:
+            if case.param[i].qp_num == 0:
                 continue
-            svr_cmd = self.generate_command(self.test_config.test_type, self.test_config.case_param[i].qp_num, \
-                                            self.test_config.case_param[i].msg_sz, 12331 + i, self.test_config.server_devices[0])
+            svr_cmd = self.generate_command(self.test_config.test_type, case.param[i].qp_num, \
+                                            case.param[i].msg_size, 12331 + i, self.test_config.server_devices[0])
             commands.append(f"ssh {self.test_config.user}@{self.test_config.servers[i]} \
-                            'cd {self.test_config.object_directory} && {svr_cmd} > test_result_s{i + 1} &'&")
+                            'cd {self.test_config.object_directory} && {svr_cmd} > test_result_s{i} &'&")
         for i in range(process_num):
-            if case.case[i].qp_num == 0:
+            if case.param[i].qp_num == 0:
                 continue
-            clt_cmd = self.generate_command(self.test_config.test_type, self.test_config.case_param[i].qp_num, \
-                                            self.test_config.case_param[i].msg_sz, 12331 + i, self.test_config.client_devices[0], self.test_config.servers[i])
+            clt_cmd = self.generate_command(self.test_config.test_type, case.param[i].qp_num, \
+                                            case.param[i].msg_size, 12331 + i, self.test_config.client_devices[0], self.test_config.servers[i])
             commands.append(f"ssh {self.test_config.user}@{self.test_config.clients[i]} \
-                            'cd {self.test_config.object_directory} && {clt_cmd} > test_result_c{i + 1} &'&")
+                            'cd {self.test_config.object_directory} && {clt_cmd} > test_result_c{i} &'&")
         self.execute_commands(commands)

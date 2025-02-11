@@ -9,36 +9,51 @@ class analyzer:
     # the input is the case
     def calculate_throughput(self, case):
         total_qp_num = 0
-        self.pps_vec = []
-        self.bps_vec = []
-        for i in range(case.param.size()):
+        self.process_pps_vec = []
+        self.process_bps_vec = []
+        for i in range(len(case.param)):
             if case.param[i].qp_num != 0:
                 msg_rate = self.parse_file_msg_rate(f"test_result_c{i}")
-                self.msg_rate_vec.append(msg_rate)
-                self.bps_vec.append(msg_rate * (case.param[i].msg_size + 64)) # unit: Mbps
+                self.process_pps_vec.append(msg_rate)
+                self.process_bps_vec.append(msg_rate * (case.param[i].msg_size + 64)) # unit: Mbps
                 total_qp_num += case.param[i].qp_num
             else:
-                self.pps_vec.append(0)
-                self.bps_vec.append(0)
+                self.process_pps_vec.append(0)
+                self.process_bps_vec.append(0)
 
-        # calculate bps and expected bps, generate a CDF
-
-        # calculate the throughput
+        for i in range(len(case.param)):
+            if case.param[i].qp_num == 0:
+                continue
+            else:
+                for j in range(case.param[i].qp_num):
+                    self.qp_bps_vec.append(self.process_bps_vec[i] / case.param[i].qp_num)
+                    self.qp_pps_vec.append(self.process_pps_vec[i] / case.param[i].qp_num)
+        
+        # calculate the cdf according to bps
+        max_bps = 100000
+        throughput = 0
+        for i in range(self.qp_bps_vec.size()):
+            if self.qp_bps_vec[i] > max_bps / self.qp_bps_vec.size():
+                throughput += 0
+            else:
+                throughput += (max_bps / self.qp_bps_vec.size() - self.qp_bps_vec[i]) / self.qp_bps_vec.size()
+        return throughput
 
         # map the throughput to the case
         # todo
 
-    def judge_anomaly(self):
-        # todo
+    def judge_anomaly(self, case):
+        if self.calculate_throughput(case) < 0.8:
+            return True
 
     # calculate case 1 - case 2
     # if all parameters in case 1 exceeds case 2, return True
-    def diff_case(self, case1: test_case, case2: test_case):
+    def case_larger(self, case1: test_case, case2: test_case):
         # todo
-        if case1.process_num < case2.process_num:
+        if len(case1.param) < len(case2.param):
             return False
         else:
-            for i in range(case1.process_num):
+            for i in range(len(case1.param)):
                 if case1.param[i].qp_num < case2.param[i].qp_num:
                     return False
                 if case1.param[i].msg_size < case2.param[i].msg_size:

@@ -7,12 +7,12 @@ class test_case:
             self.msg_size = msg_size
             self.sharing_mr = sharing_mr
             
-        def __init__(self, service_type: str, op: str):
-            self.qp_num = 0
-            self.service_type = service_type
-            self.op = op
-            self.msg_size = 0
-            self.sharing_mr = False
+        # def __init__(self, service_type: str, op: str):
+        #     self.qp_num = 0
+        #     self.service_type = service_type
+        #     self.op = op
+        #     self.msg_size = 0
+        #     self.sharing_mr = False
 
     def __init__(self):
         # todo
@@ -22,7 +22,7 @@ class test_case:
 
     def get_active_process_num(self):
         result = 0
-        for i in range(self.process_num):
+        for i in range(len(self.param)):
             if self.param[i].qp_num != 0:
                 result += 1
         return result

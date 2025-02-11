@@ -4,6 +4,7 @@ import analyzer
 import test_case
 import copy
 import random
+import time
 
 class iterator:
     def __init__(self, config: test_config, driver: case_driver, analyzer: analyzer.analyzer):
@@ -11,15 +12,26 @@ class iterator:
         self.driver = driver
         self.reach_destination = False
         self.analyzer = analyzer
+        self.anomaly_id = 0
+
+    def record_case_throughput(self, case: test_case.test_case, throughput: float):
+        print(self.anomaly_id)
+        self.anomaly_id += 1
 
     def launch_test(self):
         # in the whole test, iterate for several times
         for i in range(self.config.round_num):
+            print(f"start round {i}")
             start_case = self.set_start_case()
             case = start_case
-            while self.analyzer.diff_case(case, self.config.terminus) != True: # if the test case doesn't exceed terminus
-                self.driver.start_test() # run test and generate test_result_xx files
-                self.analyzer.calculate_throughput(case)
+            while self.analyzer.case_larger(case, self.config.terminus) != True: # if the test case doesn't exceed terminus
+                self.driver.start_test(case) # run test and generate test_result_xx files
+                time.sleep(10)
+                self.driver.stop_test()
+                throughput = self.analyzer.calculate_throughput(case)
+                if throughput < 0.8:
+                    # todo: record the current case parameters and throughput
+                    self.record_case_throughput(case, throughput)
                 case = self.set_next_case(case, start_case, self.config.terminus)
 
     def set_start_case(self):
@@ -27,13 +39,14 @@ class iterator:
         # start_process_num = 1
 
         # to do: generate the start case
-        for i in range(self.config.terminus.process_num):
+        for i in range(len(self.config.terminus.param)):
             # param = start_case.process_param(1, "RC", "WRITE", 64, False)
-            param = start_case.process_param(self.config.terminus.case[i].service_type, self.config.terminus.case[i].op)
-            start_case.case.append(param)
+            param = start_case.process_param(0, self.config.terminus.param[i].service_type, self.config.terminus.param[i].op, 0, False)
+            start_case.param.append(param)
 
         # temp setting: copy the terminus qp num
-        start_case.case[0].qp_num = self.config.terminus.case[0].qp_num
+        qp_num = self.config.terminus.param[0].qp_num
+        start_case.param[0].qp_num = qp_num
         return start_case
 
     # set the next case to run according to the current case, the original case, the final case, 
