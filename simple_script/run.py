@@ -67,14 +67,16 @@ def parse_throughput_file(file_name, small_msg_size, large_msg_size):
             line_list = list(filter(None, line_list))
             if line_list[0] == str(small_msg_size):
                 line_list[-1].strip()
-                print("res for every line: " + line_list[-1])
+                print("res for every line: " + line_list[-1] + " Mpps")
                 res.append(float(line_list[-1].replace("\x00", "")))
             elif line_list[0] == str(large_msg_size):
                 line_list[-2].strip()
-                print("res for every line: " + line_list[-2])
+                print("res for every line: " + line_list[-2] + " MBps")
                 # print("res for every line: " + line)
-                print(line_list)
+                # print(line_list)
                 res.append(float(line_list[-2].replace("\x00", "")))
+    if len(res) == 0:
+        raise Exception(f"no result in {file_name}!")
     return (sum(res) / len(res))
 
 def stop():
@@ -100,11 +102,11 @@ def stop():
         time.sleep(3)
 
 def vary_large_qp_num():
-    large_qp_num_list = [0, 1, 2, 4, 8, 16]
+    large_qp_num_list = [0, 40]
     # large_qp_num_list = [2]
-    small_qp_num = 4
+    small_qp_num = 40
     small_msg_size = 64
-    large_msg_size = 25000000
+    large_msg_size = 2500000
     test = TEST_LIST[0]
     with open("out_" + test + ".log", "w") as f:
         for large_qp_num in large_qp_num_list:
@@ -113,7 +115,7 @@ def vary_large_qp_num():
             # locals()["start_"+test](small_qp_num, large_qp_num, small_msg_size, large_msg_size)
             start_test(small_qp_num, large_qp_num, small_msg_size, large_msg_size)
             print("Start testing.......")
-            time.sleep(10)
+            time.sleep(30)
             stop()
             msg_rate = parse_throughput_file("test_result_c1_bw", small_msg_size, large_msg_size) + \
                        parse_throughput_file("test_result_c2_bw", small_msg_size, large_msg_size) + \
