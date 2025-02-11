@@ -11,9 +11,11 @@ class analyzer:
         total_qp_num = 0
         self.process_pps_vec = []
         self.process_bps_vec = []
+        self.qp_bps_vec = []
+        self.qp_pps_vec = []
         for i in range(len(case.param)):
             if case.param[i].qp_num != 0:
-                msg_rate = self.parse_file_msg_rate(f"test_result_c{i}")
+                msg_rate = self.parse_file_msg_rate(f"test_result_c{i}", case.param[i].msg_size)
                 self.process_pps_vec.append(msg_rate)
                 self.process_bps_vec.append(msg_rate * (case.param[i].msg_size + 64)) # unit: Mbps
                 total_qp_num += case.param[i].qp_num
@@ -63,7 +65,7 @@ class analyzer:
         return True
 
     # calculate the message rate
-    def parse_file_msg_rate(file_name, msg_sz):
+    def parse_file_msg_rate(self, file_name, msg_sz):
         res = [] 
         with open(file_name, "r", encoding="utf-8") as f:
             for line in f.readlines():

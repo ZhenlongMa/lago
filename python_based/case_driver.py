@@ -36,7 +36,7 @@ class case_driver:
     def generate_command(self, base_cmd, qp_num, msg_sz, port, device, server_ip=None):
         cmd = (
             f"{base_cmd} -p {port} -d {device} -i 1 -l {self.test_config.wqe_num} -m {self.test_config.mtu} "
-            f"-c RC -x {self.test_config.gid_index} -q {qp_num} -F -s {msg_sz} --run_infinitely"
+            f"-c RC -q {qp_num} -F -s {msg_sz} --run_infinitely"
         )
         if server_ip:
             cmd += f" {server_ip}"
