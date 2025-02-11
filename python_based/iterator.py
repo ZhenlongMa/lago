@@ -15,7 +15,7 @@ class iterator:
         self.anomaly_id = 0
 
     def record_case_throughput(self, case: test_case.test_case, throughput: float):
-        print(self.anomaly_id)
+        print(f"anomaly ID: {self.anomaly_id}")
         self.anomaly_id += 1
 
     def launch_test(self):
@@ -33,6 +33,9 @@ class iterator:
                     # todo: record the current case parameters and throughput
                     self.record_case_throughput(case, throughput)
                 case = self.set_next_case(case, start_case, self.config.terminus)
+                # temp set
+                if case == None:
+                    break
 
     def set_start_case(self):
         start_case = test_case.test_case()
@@ -47,6 +50,7 @@ class iterator:
         # temp setting: copy the terminus qp num
         qp_num = self.config.terminus.param[0].qp_num
         start_case.param[0].qp_num = qp_num
+        start_case.param[0].msg_size = self.config.terminus.param[0].msg_size
         return start_case
 
     # set the next case to run according to the current case, the original case, the final case, 
@@ -57,9 +61,12 @@ class iterator:
         for i in range(len(current_case.param)):
             if current_case.param[i].qp_num == 0:
                 invalid_process_index.append(i)
-        random_process = random.choice(invalid_process_index)
-        next_case.param[random_process] = copy.deepcopy(final_case.param[random_process])
-        return next_case
+        if len(invalid_process_index) == 0:
+            return None
+        else:
+            random_process = random.choice(invalid_process_index)
+            next_case.param[random_process] = copy.deepcopy(final_case.param[random_process])
+            return next_case
 
     # test peak performance of each kind of instance, and record the result in recorder
     # def test_norm(self):
