@@ -1,11 +1,12 @@
 import os
 import time
 import re
+import atexit
 
 # TEST_LIST = ["test0","test1","test2"]
 TEST_LIST = ["test"]
 
-OBJ_DIR = "/work/mazhenlong/CX-test/throughput_isolation_script"
+OBJ_DIR = "/work/mazhenlong/rnic_test/simple_script"
 SVR = "192.168.0.25"
 CLT = "192.168.0.23"
 
@@ -40,7 +41,7 @@ def start_test(small_qp_num, large_qp_num, small_msg_size, large_msg_size):
         rtn = os.system(cmd)
         if rtn != 0:
             raise Exception("\033[0;31;40mError for cmd " + cmd + "\033[0m")
-        time.sleep(2)
+        time.sleep(1)
 
 def parse_latency_file(file_name):
     res = []
@@ -67,13 +68,13 @@ def parse_throughput_file(file_name, small_msg_size, large_msg_size):
             if line_list[0] == str(small_msg_size):
                 line_list[-1].strip()
                 print("res for every line: " + line_list[-1])
-                res.append(float(line_list[-1]))
+                res.append(float(line_list[-1].replace("\x00", "")))
             elif line_list[0] == str(large_msg_size):
                 line_list[-2].strip()
                 print("res for every line: " + line_list[-2])
                 # print("res for every line: " + line)
                 print(line_list)
-                res.append(float(line_list[-2]))
+                res.append(float(line_list[-2].replace("\x00", "")))
     return (sum(res) / len(res))
 
 def stop():
@@ -92,7 +93,9 @@ def stop():
                     pid_num = line_list[1].strip()
                     kill_cmd = "ssh root@" + node + " 'kill -9 " + pid_num + "'"
                     print(kill_cmd)
-                    os.system(kill_cmd)
+                    rtn = os.system(kill_cmd)
+                    # if rtn != 0:
+                    #     raise Exception("kill cmd failed!")
         os.system("rm -rf " + OBJ_DIR + "/tmp.log")
         time.sleep(3)
 
@@ -101,7 +104,7 @@ def vary_large_qp_num():
     # large_qp_num_list = [2]
     small_qp_num = 4
     small_msg_size = 64
-    large_msg_size = 25000
+    large_msg_size = 25000000
     test = TEST_LIST[0]
     with open("out_" + test + ".log", "w") as f:
         for large_qp_num in large_qp_num_list:
@@ -110,7 +113,7 @@ def vary_large_qp_num():
             # locals()["start_"+test](small_qp_num, large_qp_num, small_msg_size, large_msg_size)
             start_test(small_qp_num, large_qp_num, small_msg_size, large_msg_size)
             print("Start testing.......")
-            time.sleep(20)
+            time.sleep(10)
             stop()
             msg_rate = parse_throughput_file("test_result_c1_bw", small_msg_size, large_msg_size) + \
                        parse_throughput_file("test_result_c2_bw", small_msg_size, large_msg_size) + \
@@ -125,5 +128,6 @@ def vary_large_qp_num():
             f.write(output_item)
 
 if __name__ == "__main__":
+    atexit.register(stop)
     vary_large_qp_num()
 
