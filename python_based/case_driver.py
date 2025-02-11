@@ -26,7 +26,7 @@ class case_driver:
                     if is_match != []:
                         line_list = line.split()
                         pid_num = line_list[1].strip()
-                        kill_cmd = "ssh {self.test_config.user}@{node} 'kill -9 {pid_num}'"
+                        kill_cmd = f"ssh {self.test_config.user}@{node} 'kill -9 {pid_num}'"
                         print(kill_cmd)
                         os.system(kill_cmd)
             os.system("rm -rf " + self.test_config.object_directory + "/tmp.log")

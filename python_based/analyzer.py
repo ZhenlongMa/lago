@@ -34,11 +34,11 @@ class analyzer:
         # calculate the cdf according to bps
         max_bps = 100000
         throughput = 0
-        for i in range(self.qp_bps_vec.size()):
-            if self.qp_bps_vec[i] > max_bps / self.qp_bps_vec.size():
+        for i in range(len(self.qp_bps_vec)):
+            if self.qp_bps_vec[i] > max_bps / len(self.qp_bps_vec):
                 throughput += 0
             else:
-                throughput += (max_bps / self.qp_bps_vec.size() - self.qp_bps_vec[i]) / self.qp_bps_vec.size()
+                throughput += (max_bps / len(self.qp_bps_vec) - self.qp_bps_vec[i]) / len(self.qp_bps_vec)
         return throughput
 
         # map the throughput to the case

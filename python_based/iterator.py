@@ -54,11 +54,11 @@ class iterator:
     def set_next_case(self, current_case, original_case, final_case):
         next_case = copy.deepcopy(current_case)
         invalid_process_index = []
-        for i in range(current_case.case.size()):
-            if current_case.case[i].qp_num == 0:
+        for i in range(len(current_case.param)):
+            if current_case.param[i].qp_num == 0:
                 invalid_process_index.append(i)
         random_process = random.choice(invalid_process_index)
-        next_case.case[random_process] = copy.deepcopy(final_case.case[random_process])
+        next_case.param[random_process] = copy.deepcopy(final_case.param[random_process])
         return next_case
 
     # test peak performance of each kind of instance, and record the result in recorder

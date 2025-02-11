@@ -1,0 +1,43 @@
+---------------------------------------------------------------------------------------
+Post List requested - CQ moderation will be the size of the post list
+---------------------------------------------------------------------------------------
+                    RDMA_Write Post List BW Test
+ Dual-port       : OFF		Device         : mlx5_0
+ Number of qps   : 4		Transport type : IB
+ Connection type : RC		Using SRQ      : OFF
+ PCIe relax order: ON
+ WARNING: CPU is not PCIe relaxed ordering compliant.
+ WARNING: You should disable PCIe RO with `--disable_pcie_relaxed` for both server and client.
+ ibv_wr* API     : ON
+ TX depth        : 128
+ Post List       : 100
+ CQ Moderation   : 100
+ Mtu             : 4096[B]
+ Link type       : IB
+ Max inline data : 0[B]
+ rdma_cm QPs	 : OFF
+ Data ex. method : Ethernet
+---------------------------------------------------------------------------------------
+ local address: LID 0x05 QPN 0x0047 PSN 0x681895 RKey 0x1fcead VAddr 0x007fdc3ba72000
+ local address: LID 0x05 QPN 0x0048 PSN 0x8bbf5b RKey 0x1fcead VAddr 0x007fdc3ba82000
+ local address: LID 0x05 QPN 0x0049 PSN 0xc1bd09 RKey 0x1fcead VAddr 0x007fdc3ba92000
+ local address: LID 0x05 QPN 0x004a PSN 0xc63224 RKey 0x1fcead VAddr 0x007fdc3baa2000
+ remote address: LID 0x0c QPN 0x0047 PSN 0xd20e3c RKey 0x1fcfae VAddr 0x007fd42ae4c000
+ remote address: LID 0x0c QPN 0x0048 PSN 0xc7d4ad RKey 0x1fcfae VAddr 0x007fd42ae5c000
+ remote address: LID 0x0c QPN 0x0049 PSN 0xa009bd RKey 0x1fcfae VAddr 0x007fd42ae6c000
+ remote address: LID 0x0c QPN 0x004a PSN 0xd01f91 RKey 0x1fcfae VAddr 0x007fd42ae7c000
+---------------------------------------------------------------------------------------
+ #bytes     #iterations    BW peak[MB/sec]    BW average[MB/sec]   MsgRate[Mpps]
+ 65536      633900           0.00               7923.56		   0.126777
+ 65536      460100           0.00               5751.12		   0.092018
+ 65536      460100           0.00               5751.16		   0.092019
+ 65536      460400           0.00               5754.95		   0.092079
+ 65536      460400           0.00               5754.90		   0.092078
+ 65536      460400           0.00               5754.89		   0.092078
+ 65536      460400           0.00               5754.97		   0.092080
+ 65536      460300           0.00               5753.67		   0.092059
+ 65536      460400           0.00               5754.03		   0.092065
+ 65536      460400           0.00               5754.90		   0.092078
+ 65536      460400           0.00               5754.92		   0.092079
+ 65536      460400           0.00               5754.95		   0.092079
+ 65536      460400           0.00               5754.93		   0.092079
