@@ -36,6 +36,7 @@ class analyzer:
         max_pps = 64000.00 # Mpps
         throughput = 0
         for i in range(len(self.qp_bps_vec)):
+            # todo: decide whether using bps or pps
             if self.qp_bps_vec[i] > max_bps / len(self.qp_bps_vec):
                 throughput += 0
             else:
