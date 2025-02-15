@@ -15,7 +15,7 @@ class iterator:
         self.anomaly_id = 0
 
     def record_case_throughput(self, case: test_case.test_case, throughput: float):
-        print(f"anomaly ID: {self.anomaly_id}")
+        print(f"anomaly ID: {self.anomaly_id}, throughput: {throughput}")
         self.anomaly_id += 1
 
     def launch_test(self):
@@ -24,14 +24,18 @@ class iterator:
             print(f"start round {i}")
             start_case = self.set_start_case()
             case = start_case
+            # todo: judge corner
             while self.analyzer.case_larger(case, self.config.terminus) != True: # if the test case doesn't exceed terminus
                 self.driver.start_test(case) # run test and generate test_result_xx files
                 time.sleep(10)
                 self.driver.stop_test()
                 throughput = self.analyzer.calculate_throughput(case)
-                if throughput < 0.8:
+                print(f"throughput: {throughput}")
+                if throughput > 0.2:
                     # todo: record the current case parameters and throughput
                     self.record_case_throughput(case, throughput)
+                # debug
+                # return
                 case = self.set_next_case(case, start_case, self.config.terminus)
                 # temp set
                 if case == None:

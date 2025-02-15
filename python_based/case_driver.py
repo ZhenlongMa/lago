@@ -57,7 +57,7 @@ class case_driver:
             rtn = os.system(cmd)
             if rtn != 0:
                 raise Exception(f"\033[0;31;40mError for cmd {cmd}\033[0m")
-            time.sleep(0.1)
+            time.sleep(1)
     
     def start_test(self, case):
         commands = []

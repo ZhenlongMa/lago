@@ -17,7 +17,7 @@ class analyzer:
             if case.param[i].qp_num != 0:
                 msg_rate = self.parse_file_msg_rate(f"test_result_c{i}", case.param[i].msg_size)
                 self.process_pps_vec.append(msg_rate)
-                self.process_bps_vec.append(msg_rate * (case.param[i].msg_size + 64)) # unit: Mbps
+                self.process_bps_vec.append(msg_rate * (case.param[i].msg_size + 64) * 8) # unit: Mbps
                 total_qp_num += case.param[i].qp_num
             else:
                 self.process_pps_vec.append(0)
@@ -32,13 +32,15 @@ class analyzer:
                     self.qp_pps_vec.append(self.process_pps_vec[i] / case.param[i].qp_num)
         
         # calculate the cdf according to bps
-        max_bps = 100000
+        max_bps = 100000.00 # Mbps
         throughput = 0
         for i in range(len(self.qp_bps_vec)):
             if self.qp_bps_vec[i] > max_bps / len(self.qp_bps_vec):
                 throughput += 0
             else:
-                throughput += (max_bps / len(self.qp_bps_vec) - self.qp_bps_vec[i]) / len(self.qp_bps_vec)
+                expected = max_bps / len(self.qp_bps_vec)
+                print(f"max_bps: {max_bps}, length: {len(self.qp_bps_vec)}, bps: {self.qp_bps_vec[i]}")
+                throughput += (max_bps / len(self.qp_bps_vec) - self.qp_bps_vec[i]) / len(self.qp_bps_vec) / (max_bps / len(self.qp_bps_vec))
         return throughput
 
         # map the throughput to the case
@@ -81,6 +83,6 @@ class analyzer:
                     # print("res for every line: " + line_list[-1])
                     res.append(float(line_list[-1]))
         if len(res) == 0:
-            return 0
+            raise Exception(f"no result in {file_name}!")
         else:
             return (sum(res) / len(res))
