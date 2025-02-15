@@ -33,6 +33,7 @@ class analyzer:
         
         # calculate the cdf according to bps
         max_bps = 100000.00 # Mbps
+        max_pps = 64000.00 # Mpps
         throughput = 0
         for i in range(len(self.qp_bps_vec)):
             if self.qp_bps_vec[i] > max_bps / len(self.qp_bps_vec):
