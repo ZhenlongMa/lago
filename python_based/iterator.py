@@ -16,6 +16,13 @@ class iterator:
 
     def record_case_throughput(self, case: test_case.test_case, throughput: float):
         print(f"anomaly ID: {self.anomaly_id}, throughput: {throughput}")
+        anomaly_file = open(f"anomaly_{self.anomaly_id}", "w")
+        anomaly_file.write(f"Throughput: {throughput}")
+        anomaly_file.write("qp_num\tservice_type\top\tmsg_size\tsharing_mr")
+        for i in range(len(case.param)):
+            anomaly_file.write(f"{case.param[i].qp_num}\t{case.param[i].service_type}\t{case.param[i].op}\
+                                 {case.param[i].msg_size}\t{case.param[i].sharing_mr}")
+        anomaly_file.close()
         self.anomaly_id += 1
 
     def launch_test(self):
@@ -27,7 +34,7 @@ class iterator:
             # todo: judge corner
             while self.analyzer.case_larger(case, self.config.terminus) != True: # if the test case doesn't exceed terminus
                 self.driver.start_test(case) # run test and generate test_result_xx files
-                time.sleep(10)
+                time.sleep(self.driver.test_time)
                 self.driver.stop_test()
                 throughput = self.analyzer.calculate_throughput(case)
                 print(f"throughput: {throughput}")
