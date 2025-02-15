@@ -74,10 +74,18 @@ class test_config:
     #     self.case_param.append(test_param)
 
     # generate the boundary of the test and save as a case
-    # todo: change this version to be more heterogeneous
+    # todo: change this version to be more heterogeneous and randomized
     def generate_terminus(self):
         terminus_process_num = 7
         self.terminus = test_case.test_case()
-        for i in range(terminus_process_num):
-            param = self.terminus.process_param(4, "RC", "WRITE", 65536, True)
+        # for i in range(terminus_process_num):
+        #     param = self.terminus.process_param(4, "RC", "WRITE", 65536, True)
+        #     self.terminus.param.append(param)
+        for i in range(3):
+            param = self.terminus.process_param(qp_num = 4, service_type = "RC", op = "WRITE", \
+                                                msg_size = 65536, sharing_mr = True)
+            self.terminus.param.append(param)
+        for i in range(4):
+            param = self.terminus.process_param(qp_num = 4, service_type = "RC", op = "WRITE", \
+                                                msg_size = 64, sharing_mr = True)
             self.terminus.param.append(param)
