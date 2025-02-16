@@ -26,7 +26,7 @@ class test_config:
             self.qp_num = 64 # total QP number
 
     def __init__(self, platform):
-        self.round_num = 5 # test for five rounds
+        self.round_num = 1 # test for five rounds
         self.dst = self.destination()
         self.process_num = 0
         self.generate_terminus()
@@ -78,14 +78,16 @@ class test_config:
     def generate_terminus(self):
         terminus_process_num = 7
         self.terminus = test_case.test_case()
-        # for i in range(terminus_process_num):
-        #     param = self.terminus.process_param(4, "RC", "WRITE", 65536, True)
-        #     self.terminus.param.append(param)
+        # todo: server side launch
         for i in range(3):
-            param = self.terminus.process_param(qp_num = 4, service_type = "RC", op = "WRITE", \
+            param = self.terminus.process_param(qp_num = 4, service_type = "RC", op = "READ", \
                                                 msg_size = 65536, sharing_mr = True)
             self.terminus.param.append(param)
-        for i in range(4):
-            param = self.terminus.process_param(qp_num = 4, service_type = "RC", op = "WRITE", \
+        for i in range(2):
+            param = self.terminus.process_param(qp_num = 4, service_type = "RC", op = "READ", \
+                                                msg_size = 64, sharing_mr = True)
+            self.terminus.param.append(param)
+        for i in range(2):
+            param = self.terminus.process_param(qp_num = 4, service_type = "RC", op = "READ", \
                                                 msg_size = 64, sharing_mr = True)
             self.terminus.param.append(param)

@@ -17,11 +17,13 @@ class iterator:
     def record_case_throughput(self, case: test_case.test_case, throughput: float):
         print(f"anomaly ID: {self.anomaly_id}, throughput: {throughput}")
         anomaly_file = open(f"anomaly_{self.anomaly_id}", "w")
-        anomaly_file.write(f"Throughput: {throughput}")
-        anomaly_file.write("qp_num\tservice_type\top\tmsg_size\tsharing_mr")
+        anomaly_file.write(f"Throughput: {throughput}\n")
+        anomaly_file.write(f"******************************\n")
+        anomaly_file.write(f"Case Parameter:\n")
+        anomaly_file.write("qp_num\tsvc_type\top\t\tmsg_size\tsharing_mr\n")
         for i in range(len(case.param)):
-            anomaly_file.write(f"{case.param[i].qp_num}\t{case.param[i].service_type}\t{case.param[i].op}\
-                                 {case.param[i].msg_size}\t{case.param[i].sharing_mr}")
+            anomaly_file.write(f"{case.param[i].qp_num}\t\t{case.param[i].service_type}\t\t\t"
+                               f"{case.param[i].op}\t{case.param[i].msg_size}\t{case.param[i].sharing_mr}\n")
         anomaly_file.close()
         self.anomaly_id += 1
 
@@ -41,6 +43,8 @@ class iterator:
                 if throughput > 0.2:
                     # todo: record the current case parameters and throughput
                     self.record_case_throughput(case, throughput)
+                    # debug
+                    # return
                 # debug
                 # return
                 case = self.set_next_case(case, start_case, self.config.terminus)
@@ -62,6 +66,7 @@ class iterator:
         qp_num = self.config.terminus.param[0].qp_num
         start_case.param[0].qp_num = qp_num
         start_case.param[0].msg_size = self.config.terminus.param[0].msg_size
+        start_case.param[0].sharing_mr = self.config.terminus.param[0].sharing_mr
         return start_case
 
     # set the next case to run according to the current case, the original case, the final case, 
