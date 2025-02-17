@@ -7,10 +7,8 @@ import iterator as iterator
 import case_driver
 import analyzer
 
-def clean():
-    os.system("rm test_result_*")
-
 def main():
+    # remove result files
     os.system("rm test_result_* anomaly*")
     config = tc.test_config("28")
     # config.init_case()

@@ -1,0 +1,109 @@
+---------------------------------------------------------------------------------------
+Post List requested - CQ moderation will be the size of the post list
+---------------------------------------------------------------------------------------
+                    RDMA_Write Post List BW Test
+ Dual-port       : OFF		Device         : mlx5_0
+ Number of qps   : 40		Transport type : IB
+ Connection type : RC		Using SRQ      : OFF
+ PCIe relax order: ON
+ WARNING: CPU is not PCIe relaxed ordering compliant.
+ WARNING: You should disable PCIe RO with `--disable_pcie_relaxed` for both server and client.
+ ibv_wr* API     : ON
+ TX depth        : 128
+ Post List       : 100
+ CQ Moderation   : 100
+ Mtu             : 4096[B]
+ Link type       : IB
+ Max inline data : 0[B]
+ rdma_cm QPs	 : OFF
+ Data ex. method : Ethernet
+---------------------------------------------------------------------------------------
+ local address: LID 0x0c QPN 0x2c33 PSN 0xf1b4ca RKey 0x1fd0ab VAddr 0x007f52e3228000
+ local address: LID 0x0c QPN 0x2c34 PSN 0x56dfec RKey 0x1fd0ab VAddr 0x007f52e3229000
+ local address: LID 0x0c QPN 0x2c35 PSN 0x2ce0c6 RKey 0x1fd0ab VAddr 0x007f52e322a000
+ local address: LID 0x0c QPN 0x2c36 PSN 0xbc379d RKey 0x1fd0ab VAddr 0x007f52e322b000
+ local address: LID 0x0c QPN 0x2c37 PSN 0x4871ec RKey 0x1fd0ab VAddr 0x007f52e322c000
+ local address: LID 0x0c QPN 0x2c38 PSN 0x5adede RKey 0x1fd0ab VAddr 0x007f52e322d000
+ local address: LID 0x0c QPN 0x2c39 PSN 0x7e19e5 RKey 0x1fd0ab VAddr 0x007f52e322e000
+ local address: LID 0x0c QPN 0x2c3a PSN 0xd6007a RKey 0x1fd0ab VAddr 0x007f52e322f000
+ local address: LID 0x0c QPN 0x2c3b PSN 0xd2a996 RKey 0x1fd0ab VAddr 0x007f52e3230000
+ local address: LID 0x0c QPN 0x2c3c PSN 0x1d7660 RKey 0x1fd0ab VAddr 0x007f52e3231000
+ local address: LID 0x0c QPN 0x2c3d PSN 0x76dc84 RKey 0x1fd0ab VAddr 0x007f52e3232000
+ local address: LID 0x0c QPN 0x2c3e PSN 0xa53cc7 RKey 0x1fd0ab VAddr 0x007f52e3233000
+ local address: LID 0x0c QPN 0x2c3f PSN 0x7298a7 RKey 0x1fd0ab VAddr 0x007f52e3234000
+ local address: LID 0x0c QPN 0x2c40 PSN 0x30f2c8 RKey 0x1fd0ab VAddr 0x007f52e3235000
+ local address: LID 0x0c QPN 0x2c41 PSN 0xd693e6 RKey 0x1fd0ab VAddr 0x007f52e3236000
+ local address: LID 0x0c QPN 0x2c42 PSN 0x8f6cb2 RKey 0x1fd0ab VAddr 0x007f52e3237000
+ local address: LID 0x0c QPN 0x2c43 PSN 0xf5aedf RKey 0x1fd0ab VAddr 0x007f52e3238000
+ local address: LID 0x0c QPN 0x2c44 PSN 0xaf66ad RKey 0x1fd0ab VAddr 0x007f52e3239000
+ local address: LID 0x0c QPN 0x2c45 PSN 0x4d6484 RKey 0x1fd0ab VAddr 0x007f52e323a000
+ local address: LID 0x0c QPN 0x2c46 PSN 0x34cd21 RKey 0x1fd0ab VAddr 0x007f52e323b000
+ local address: LID 0x0c QPN 0x2c47 PSN 0xfd566e RKey 0x1fd0ab VAddr 0x007f52e323c000
+ local address: LID 0x0c QPN 0x2c48 PSN 0xd59ca5 RKey 0x1fd0ab VAddr 0x007f52e323d000
+ local address: LID 0x0c QPN 0x2c49 PSN 0x8167a5 RKey 0x1fd0ab VAddr 0x007f52e323e000
+ local address: LID 0x0c QPN 0x2c4a PSN 0x2f1449 RKey 0x1fd0ab VAddr 0x007f52e323f000
+ local address: LID 0x0c QPN 0x2c4b PSN 0x386a16 RKey 0x1fd0ab VAddr 0x007f52e3240000
+ local address: LID 0x0c QPN 0x2c4c PSN 0x5c2329 RKey 0x1fd0ab VAddr 0x007f52e3241000
+ local address: LID 0x0c QPN 0x2c4d PSN 0xfdc696 RKey 0x1fd0ab VAddr 0x007f52e3242000
+ local address: LID 0x0c QPN 0x2c4e PSN 0xce2560 RKey 0x1fd0ab VAddr 0x007f52e3243000
+ local address: LID 0x0c QPN 0x2c4f PSN 0x45a3ff RKey 0x1fd0ab VAddr 0x007f52e3244000
+ local address: LID 0x0c QPN 0x2c50 PSN 0xa1f495 RKey 0x1fd0ab VAddr 0x007f52e3245000
+ local address: LID 0x0c QPN 0x2c51 PSN 0x260f87 RKey 0x1fd0ab VAddr 0x007f52e3246000
+ local address: LID 0x0c QPN 0x2c52 PSN 0xe70d6a RKey 0x1fd0ab VAddr 0x007f52e3247000
+ local address: LID 0x0c QPN 0x2c53 PSN 0x91ef17 RKey 0x1fd0ab VAddr 0x007f52e3248000
+ local address: LID 0x0c QPN 0x2c54 PSN 0x325d4c RKey 0x1fd0ab VAddr 0x007f52e3249000
+ local address: LID 0x0c QPN 0x2c55 PSN 0x53be02 RKey 0x1fd0ab VAddr 0x007f52e324a000
+ local address: LID 0x0c QPN 0x2c56 PSN 0x7cbb30 RKey 0x1fd0ab VAddr 0x007f52e324b000
+ local address: LID 0x0c QPN 0x2c57 PSN 0x8a2523 RKey 0x1fd0ab VAddr 0x007f52e324c000
+ local address: LID 0x0c QPN 0x2c58 PSN 0xe7e1f9 RKey 0x1fd0ab VAddr 0x007f52e324d000
+ local address: LID 0x0c QPN 0x2c59 PSN 0x699108 RKey 0x1fd0ab VAddr 0x007f52e324e000
+ local address: LID 0x0c QPN 0x2c5a PSN 0xcf0450 RKey 0x1fd0ab VAddr 0x007f52e324f000
+ remote address: LID 0x05 QPN 0x2cd2 PSN 0xbcaef7 RKey 0x1fcfaa VAddr 0x007f782fea2000
+ remote address: LID 0x05 QPN 0x2cd3 PSN 0x3d315 RKey 0x1fcfaa VAddr 0x007f782fea3000
+ remote address: LID 0x05 QPN 0x2cd4 PSN 0x133f3b RKey 0x1fcfaa VAddr 0x007f782fea4000
+ remote address: LID 0x05 QPN 0x2cd5 PSN 0x8b8d6e RKey 0x1fcfaa VAddr 0x007f782fea5000
+ remote address: LID 0x05 QPN 0x2cd6 PSN 0x55c1e9 RKey 0x1fcfaa VAddr 0x007f782fea6000
+ remote address: LID 0x05 QPN 0x2cd7 PSN 0x1f3b97 RKey 0x1fcfaa VAddr 0x007f782fea7000
+ remote address: LID 0x05 QPN 0x2cd8 PSN 0xf3caaa RKey 0x1fcfaa VAddr 0x007f782fea8000
+ remote address: LID 0x05 QPN 0x2cd9 PSN 0x5f425b RKey 0x1fcfaa VAddr 0x007f782fea9000
+ remote address: LID 0x05 QPN 0x2cda PSN 0xdfdc63 RKey 0x1fcfaa VAddr 0x007f782feaa000
+ remote address: LID 0x05 QPN 0x2cdb PSN 0x5c45a9 RKey 0x1fcfaa VAddr 0x007f782feab000
+ remote address: LID 0x05 QPN 0x2cdc PSN 0xbcb499 RKey 0x1fcfaa VAddr 0x007f782feac000
+ remote address: LID 0x05 QPN 0x2cdd PSN 0xe11bb8 RKey 0x1fcfaa VAddr 0x007f782fead000
+ remote address: LID 0x05 QPN 0x2cde PSN 0x690b44 RKey 0x1fcfaa VAddr 0x007f782feae000
+ remote address: LID 0x05 QPN 0x2cdf PSN 0xd4cda1 RKey 0x1fcfaa VAddr 0x007f782feaf000
+ remote address: LID 0x05 QPN 0x2ce0 PSN 0x45b84b RKey 0x1fcfaa VAddr 0x007f782feb0000
+ remote address: LID 0x05 QPN 0x2ce1 PSN 0xb0a9b3 RKey 0x1fcfaa VAddr 0x007f782feb1000
+ remote address: LID 0x05 QPN 0x2ce2 PSN 0xd78e4c RKey 0x1fcfaa VAddr 0x007f782feb2000
+ remote address: LID 0x05 QPN 0x2ce3 PSN 0x137616 RKey 0x1fcfaa VAddr 0x007f782feb3000
+ remote address: LID 0x05 QPN 0x2ce4 PSN 0x8c4a39 RKey 0x1fcfaa VAddr 0x007f782feb4000
+ remote address: LID 0x05 QPN 0x2ce5 PSN 0x393932 RKey 0x1fcfaa VAddr 0x007f782feb5000
+ remote address: LID 0x05 QPN 0x2ce6 PSN 0xa29fab RKey 0x1fcfaa VAddr 0x007f782feb6000
+ remote address: LID 0x05 QPN 0x2ce7 PSN 0x3e999e RKey 0x1fcfaa VAddr 0x007f782feb7000
+ remote address: LID 0x05 QPN 0x2ce8 PSN 0x8d3aa RKey 0x1fcfaa VAddr 0x007f782feb8000
+ remote address: LID 0x05 QPN 0x2ce9 PSN 0x80906a RKey 0x1fcfaa VAddr 0x007f782feb9000
+ remote address: LID 0x05 QPN 0x2cea PSN 0xdbea23 RKey 0x1fcfaa VAddr 0x007f782feba000
+ remote address: LID 0x05 QPN 0x2ceb PSN 0x156b2 RKey 0x1fcfaa VAddr 0x007f782febb000
+ remote address: LID 0x05 QPN 0x2cec PSN 0xedcdeb RKey 0x1fcfaa VAddr 0x007f782febc000
+ remote address: LID 0x05 QPN 0x2ced PSN 0xf3a291 RKey 0x1fcfaa VAddr 0x007f782febd000
+ remote address: LID 0x05 QPN 0x2cee PSN 0xe1f7dc RKey 0x1fcfaa VAddr 0x007f782febe000
+ remote address: LID 0x05 QPN 0x2cef PSN 0x4637ae RKey 0x1fcfaa VAddr 0x007f782febf000
+ remote address: LID 0x05 QPN 0x2cf0 PSN 0x6b172c RKey 0x1fcfaa VAddr 0x007f782fec0000
+ remote address: LID 0x05 QPN 0x2cf1 PSN 0x458cab RKey 0x1fcfaa VAddr 0x007f782fec1000
+ remote address: LID 0x05 QPN 0x2cf2 PSN 0xe83c4 RKey 0x1fcfaa VAddr 0x007f782fec2000
+ remote address: LID 0x05 QPN 0x2cf3 PSN 0x4d18f5 RKey 0x1fcfaa VAddr 0x007f782fec3000
+ remote address: LID 0x05 QPN 0x2cf4 PSN 0x1b7af7 RKey 0x1fcfaa VAddr 0x007f782fec4000
+ remote address: LID 0x05 QPN 0x2cf5 PSN 0x284d81 RKey 0x1fcfaa VAddr 0x007f782fec5000
+ remote address: LID 0x05 QPN 0x2cf6 PSN 0xb837a0 RKey 0x1fcfaa VAddr 0x007f782fec6000
+ remote address: LID 0x05 QPN 0x2cf7 PSN 0x5e0f32 RKey 0x1fcfaa VAddr 0x007f782fec7000
+ remote address: LID 0x05 QPN 0x2cf8 PSN 0xe8084d RKey 0x1fcfaa VAddr 0x007f782fec8000
+ remote address: LID 0x05 QPN 0x2cf9 PSN 0x6bcab1 RKey 0x1fcfaa VAddr 0x007f782fec9000
+---------------------------------------------------------------------------------------
+ #bytes     #iterations    BW peak[MB/sec]    BW average[MB/sec]   MsgRate[Mpps]
+ 64         96770700         0.00               1181.25		   19.353595
+ 64         43397200         0.00               529.74 		   8.679282
+ 64         43059700         0.00               525.62 		   8.611802
+ 64         43497500         0.00               530.97 		   8.699402
+ 64         43514500         0.00               531.17 		   8.702651
+ 64         43582500         0.00               532.00 		   8.716291
+ 64         32588900         0.00               397.81 		   6.517638
