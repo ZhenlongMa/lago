@@ -14,16 +14,16 @@ SVR_DEV = "mlx5_0"
 CLT_DEV = "mlx5_0"
 
 def start_test(small_qp_num, large_qp_num, small_msg_size, large_msg_size):
-    SVR_CMD1 = "ib_write_bw -p 12550 -d " + SVR_DEV  + " -i 1 -l 100 -m 4096 -c RC -q " + str(small_qp_num) + " -F -s " + str(small_msg_size) + " --sl=1 --run_infinitely"
-    SVR_CMD2 = "ib_write_bw -p 12551 -d " + SVR_DEV  + " -i 1 -l 100 -m 4096 -c RC -q " + str(small_qp_num) + " -F -s " + str(small_msg_size) + " --sl=1 --run_infinitely"
-    SVR_CMD3 = "ib_write_bw -p 12552 -d " + SVR_DEV  + " -i 1 -l 100 -m 4096 -c RC -q " + str(small_qp_num) + " -F -s " + str(small_msg_size) + " --sl=1 --run_infinitely"
-    SVR_CMD4 = "ib_write_bw -p 12553 -d " + SVR_DEV  + " -i 1 -l 100 -m 4096 -c RC -q " + str(small_qp_num) + " -F -s " + str(small_msg_size) + " --sl=1 --run_infinitely"
-    SVR_CMD5 = "ib_write_bw -p 12554 -d " + SVR_DEV  + " -i 1 -l 1 -m 4096 -c RC -q " + str(large_qp_num) + " -F -s " + str(large_msg_size) + " --sl=1 --run_infinitely"
-    CLT_CMD1 = "ib_write_bw -p 12550 -d " + SVR_DEV  + " -i 1 -l 100 -m 4096 -c RC -q " + str(small_qp_num) + " -F -s " + str(small_msg_size) + " --sl=1 --run_infinitely " + SVR
-    CLT_CMD2 = "ib_write_bw -p 12551 -d " + SVR_DEV  + " -i 1 -l 100 -m 4096 -c RC -q " + str(small_qp_num) + " -F -s " + str(small_msg_size) + " --sl=1 --run_infinitely " + SVR
-    CLT_CMD3 = "ib_write_bw -p 12552 -d " + SVR_DEV  + " -i 1 -l 100 -m 4096 -c RC -q " + str(small_qp_num) + " -F -s " + str(small_msg_size) + " --sl=1 --run_infinitely " + SVR
-    CLT_CMD4 = "ib_write_bw -p 12553 -d " + SVR_DEV  + " -i 1 -l 100 -m 4096 -c RC -q " + str(small_qp_num) + " -F -s " + str(small_msg_size) + " --sl=1 --run_infinitely " + SVR
-    CLT_CMD5 = "ib_write_bw -p 12554 -d " + SVR_DEV  + " -i 1 -l 1 -m 4096 -c RC -q " + str(large_qp_num) + " -F -s " + str(large_msg_size) + " --sl=1 --run_infinitely " + SVR
+    SVR_CMD1 = "ib_read_bw -p 12550 -d " + SVR_DEV  + " -i 1 -l 100 -m 4096 -c RC -q " + str(small_qp_num) + " -F -s " + str(small_msg_size) + " --sl=1 --run_infinitely "
+    SVR_CMD2 = "ib_read_bw -p 12551 -d " + SVR_DEV  + " -i 1 -l 100 -m 4096 -c RC -q " + str(small_qp_num) + " -F -s " + str(small_msg_size) + " --sl=1 --run_infinitely "
+    SVR_CMD3 = "ib_write_bw -p 12552 -d " + SVR_DEV  + " -i 1 -l 100 -m 4096 -c RC -q " + str(small_qp_num) + " -F -s " + str(small_msg_size) + " --sl=1 --run_infinitely "
+    SVR_CMD4 = "ib_write_bw -p 12553 -d " + SVR_DEV  + " -i 1 -l 100 -m 4096 -c RC -q " + str(small_qp_num) + " -F -s " + str(small_msg_size) + " --sl=1 --run_infinitely "
+    SVR_CMD5 = "ib_write_bw -p 12554 -d " + SVR_DEV  + " -i 1 -l 1 -m 4096 -c RC -q " + str(large_qp_num) + " -F -s " + str(large_msg_size) + " --sl=1 --run_infinitely "
+    CLT_CMD1 = "ib_read_bw -p 12550 -d " + SVR_DEV  + " -i 1 -l 100 -m 4096 -c RC -q " + str(small_qp_num) + " -F -s " + str(small_msg_size) + " --sl=1 --run_infinitely  " + SVR
+    CLT_CMD2 = "ib_read_bw -p 12551 -d " + SVR_DEV  + " -i 1 -l 100 -m 4096 -c RC -q " + str(small_qp_num) + " -F -s " + str(small_msg_size) + " --sl=1 --run_infinitely  " + SVR
+    CLT_CMD3 = "ib_write_bw -p 12552 -d " + SVR_DEV  + " -i 1 -l 100 -m 4096 -c RC -q " + str(small_qp_num) + " -F -s " + str(small_msg_size) + " --sl=1 --run_infinitely  " + SVR
+    CLT_CMD4 = "ib_write_bw -p 12553 -d " + SVR_DEV  + " -i 1 -l 100 -m 4096 -c RC -q " + str(small_qp_num) + " -F -s " + str(small_msg_size) + " --sl=1 --run_infinitely  " + SVR
+    CLT_CMD5 = "ib_write_bw -p 12554 -d " + SVR_DEV  + " -i 1 -l 1 -m 4096 -c RC -q " + str(large_qp_num) + " -F -s " + str(large_msg_size) + " --sl=1 --run_infinitely  " + SVR
     cmd_list = [
         "ssh root@" + SVR  + " 'cd " + OBJ_DIR + " && " + SVR_CMD1 + " > test_result_s1_bw &'&",
         "ssh root@" + SVR  + " 'cd " + OBJ_DIR + " && " + SVR_CMD2 + " > test_result_s2_bw &'&",
@@ -89,7 +89,7 @@ def stop():
         with open(OBJ_DIR + "/tmp.log", "r", encoding ="utf-8") as f:
             for line in f.readlines():
                 line = line.strip()
-                is_match = re.findall(r"(ib_write_bw)|(ib_write_lat)", line)
+                is_match = re.findall(r"(ib_write_bw)|(ib_write_lat)|(ib_read_bw)|(ib_read_lat)", line)
                 if is_match != []:
                     line_list = line.split()
                     pid_num = line_list[1].strip()
@@ -102,9 +102,10 @@ def stop():
         time.sleep(3)
 
 def vary_large_qp_num():
-    large_qp_num_list = [0, 40]
+    # large_qp_num_list = [0, 40]
+    large_qp_num_list = [0]
     # large_qp_num_list = [2]
-    small_qp_num = 40
+    small_qp_num = 4
     small_msg_size = 64
     large_msg_size = 2500000
     test = TEST_LIST[0]
