@@ -34,16 +34,16 @@ class analyzer:
         # calculate the cdf according to bps
         max_bps = 100000.00 # Mbps
         max_pps = 64000.00 # Mpps
-        throughput = 0
+        bias = 0
         for i in range(len(self.qp_bps_vec)):
             # todo: decide whether using bps or pps
             if self.qp_bps_vec[i] > max_bps / len(self.qp_bps_vec):
-                throughput += 0
+                bias += 0
             else:
                 expected = max_bps / len(self.qp_bps_vec)
                 print(f"max_bps: {max_bps}, length: {len(self.qp_bps_vec)}, bps: {self.qp_bps_vec[i]}")
-                throughput += (max_bps / len(self.qp_bps_vec) - self.qp_bps_vec[i]) / len(self.qp_bps_vec) / (max_bps / len(self.qp_bps_vec))
-        return throughput
+                bias += (max_bps / len(self.qp_bps_vec) - self.qp_bps_vec[i]) / len(self.qp_bps_vec) / (max_bps / len(self.qp_bps_vec))
+        return 1 - bias
 
         # map the throughput to the case
         # todo

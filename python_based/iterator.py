@@ -40,7 +40,7 @@ class iterator:
                 self.driver.stop_test()
                 throughput = self.analyzer.calculate_throughput(case)
                 print(f"throughput: {throughput}")
-                if throughput > 0.2:
+                if throughput < 0.8:
                     # todo: record the current case parameters and throughput
                     self.record_case_throughput(case, throughput)
                     # debug
