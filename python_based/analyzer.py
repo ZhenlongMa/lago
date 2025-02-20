@@ -52,7 +52,6 @@ class analyzer:
         if self.calculate_throughput(case) < 0.8:
             return True
 
-    # calculate case 1 - case 2
     # if all parameters in case 1 exceeds case 2, return True
     def case_larger(self, case1: test_case, case2: test_case):
         # todo
@@ -64,9 +63,13 @@ class analyzer:
                     return False
                 if case1.param[i].msg_size < case2.param[i].msg_size:
                     return False
-                if case1.param[i].sharing_mr == False and case2.param[i].sharing_mr == True:
+                if case1.param[i].sharing_mr == 0 and case2.param[i].sharing_mr == 1:
                     return False
         return True
+
+    # calculate the difference betwen two cases
+    def case_diff(self, case1: test_case, case2: test_case):
+        a = 1
 
     # calculate the message rate
     def parse_file_msg_rate(self, file_name, msg_sz):

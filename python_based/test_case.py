@@ -1,6 +1,9 @@
 class test_case:
     class process_param:
-        def __init__(self, qp_num: int, service_type: str, op: str, msg_size:int, sharing_mr: bool):
+        size_list = [64, 1024, 16384]
+        qp_num_list = [4, 64, 1024]
+        
+        def __init__(self, qp_num: int, service_type: str, op: str, msg_size:int, sharing_mr: int):
             self.qp_num = qp_num
             self.service_type = service_type
             self.op = op
@@ -19,6 +22,7 @@ class test_case:
         self.process_num = 0
         self.param = [] # store for each process
         self.total_qp_num = 0
+        self.new_proc_id = 0
 
     def get_active_process_num(self):
         result = 0

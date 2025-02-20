@@ -13,6 +13,7 @@ class iterator:
         self.reach_destination = False
         self.analyzer = analyzer
         self.anomaly_id = 0
+        self.anonaly_case = []
 
     def record_case_throughput(self, case: test_case.test_case, throughput: float):
         print(f"anomaly ID: {self.anomaly_id}, throughput: {throughput}")
@@ -33,22 +34,47 @@ class iterator:
             print(f"start round {i}")
             start_case = self.set_start_case()
             case = start_case
-            # todo: judge corner
             while self.analyzer.case_larger(case, self.config.terminus) != True: # if the test case doesn't exceed terminus
-                self.driver.start_test(case) # run test and generate test_result_xx files
-                time.sleep(self.driver.test_time)
-                self.driver.stop_test()
+                self.driver.test(case) # run test and generate test_result_xx files
                 throughput = self.analyzer.calculate_throughput(case)
                 print(f"throughput: {throughput}")
                 if throughput < 0.8:
-                    # todo: record the current case parameters and throughput
+                    print(f"throughput degradation! search for anoamly factor!")
+                    
+                    # determine the factor leading to the anomaly
+                    try_case = copy.deepcopy(case)
+                    anomaly_case = copy.deepcopy(case)
+
+                    # iteratively change the parameter and test the throughput, if a parameter does not cause the throughput degradation,
+                    # label it as -1 indicating that this parameter is irrelavant
+
+                    # change qp num
+                    try_case.param[try_case.new_proc_id].qp_num = try_case.param[try_case.new_proc_id].qp_num / 2
+                    self.driver.test(try_case)
+                    try_throughput = self.analyzer.calculate_throughput(try_case)
+                    print(f"throughput: {try_throughput}")
+                    if try_throughput < 0.8:
+                        anomaly_case.param[anomaly_case.new_proc_id].qp_num = -1
+
+                    # change msg size
+                    try_case.param[try_case.new_proc_id].msg_size = try_case.param[try_case.new_proc_id].msg_size / 2
+                    self.driver.test(try_case)
+                    try_throughput = self.analyzer.calculate_throughput(try_case)
+                    print(f"throughput: {try_throughput}")
+                    if try_throughput < 0.8:
+                        anomaly_case.param[anomaly_case.new_proc_id].msg_size = -1
+
+                    # change sharing mr
+                    if try_case.param[try_case.new_proc_id].sharing_mr == 0:
+                        try_case.param[try_case.new_proc_id].sharing_mr = 1
+                        try_throughput = self.analyzer.calculate_throughput(try_case)
+                        if try_throughput < 0.8:
+                            anomaly_case.param[anomaly_case.new_proc_id].sharing_mr = -1
+                    else:
+                        anomaly_case.param[anomaly_case.new_proc_id].sharing_mr = -1
+                    self.anonaly_case.append(anomaly_case)
                     self.record_case_throughput(case, throughput)
-                    # debug
-                    # return
-                # debug
-                # return
                 case = self.set_next_case(case, start_case, self.config.terminus)
-                # temp set
                 if case == None:
                     break
 
@@ -67,6 +93,7 @@ class iterator:
         start_case.param[0].qp_num = qp_num
         start_case.param[0].msg_size = self.config.terminus.param[0].msg_size
         start_case.param[0].sharing_mr = self.config.terminus.param[0].sharing_mr
+        start_case.new_proc_id = 0
         return start_case
 
     # set the next case to run according to the current case, the original case, the final case, 
@@ -82,8 +109,5 @@ class iterator:
         else:
             random_process = random.choice(invalid_process_index)
             next_case.param[random_process] = copy.deepcopy(final_case.param[random_process])
+            next_case.new_proc_id = random_process
             return next_case
-
-    # test peak performance of each kind of instance, and record the result in recorder
-    # def test_norm(self):
-        # todo

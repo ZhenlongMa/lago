@@ -10,10 +10,8 @@ class test_config:
 
     case_param = []
 
-    size_list = [64, 256, 1024, 4096, 16384, 65536, 1048576]
-
     class param:
-        def __init__(self, qp_num: int, service_type: str, op:str, msg_size:int, sharing_mr: bool):
+        def __init__(self, qp_num: int, service_type: str, op:str, msg_size:int, sharing_mr: int):
             self.qp_num = qp_num
             self.service_type = service_type
             self.op = op
@@ -81,13 +79,13 @@ class test_config:
         # todo: server side launch
         for i in range(3):
             param = self.terminus.process_param(qp_num = 4, service_type = "RC", op = "READ", \
-                                                msg_size = 65536, sharing_mr = True)
+                                                msg_size = 65536, sharing_mr = 1)
             self.terminus.param.append(param)
         for i in range(2):
             param = self.terminus.process_param(qp_num = 4, service_type = "RC", op = "READ", \
-                                                msg_size = 64, sharing_mr = True)
+                                                msg_size = 64, sharing_mr = 1)
             self.terminus.param.append(param)
         for i in range(2):
             param = self.terminus.process_param(qp_num = 4, service_type = "RC", op = "READ", \
-                                                msg_size = 64, sharing_mr = True)
+                                                msg_size = 64, sharing_mr = 1)
             self.terminus.param.append(param)

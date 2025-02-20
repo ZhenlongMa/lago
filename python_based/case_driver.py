@@ -42,11 +42,13 @@ class case_driver:
             time.sleep(1)
         print("process cleaned!")
 
-    def generate_command(self, base_cmd, qp_num, msg_sz, port, device, server_ip=None):
+    def generate_command(self, base_cmd, qp_num, msg_sz, port, device, server_ip=None, sharing_mr):
         cmd = (
             f"{base_cmd} -p {port} -d {device} -i 1 -l {self.test_config.wqe_num} -m {self.test_config.mtu} "
             f"-c RC -q {qp_num} -F -s {msg_sz} --run_infinitely"
         )
+        if sharing_mr == 0:
+            cmd += f" --mr_per_qp"
         if server_ip:
             cmd += f" {server_ip}"
         return cmd
@@ -66,14 +68,19 @@ class case_driver:
             if case.param[i].qp_num == 0:
                 continue
             svr_cmd = self.generate_command(self.test_config.test_type, case.param[i].qp_num, \
-                                            case.param[i].msg_size, 12331 + i, self.test_config.server_devices[0])
+                                            case.param[i].msg_size, 12331 + i, self.test_config.server_devices[0], None, case.param[i].sharing_mr)
             commands.append(f"ssh {self.test_config.user}@{self.test_config.servers[0]} \
                             'cd {self.test_config.object_directory} && {svr_cmd} > test_result_s{i} &'&")
         for i in range(process_num):
             if case.param[i].qp_num == 0:
                 continue
             clt_cmd = self.generate_command(self.test_config.test_type, case.param[i].qp_num, \
-                                            case.param[i].msg_size, 12331 + i, self.test_config.client_devices[0], self.test_config.servers[0])
+                                            case.param[i].msg_size, 12331 + i, self.test_config.client_devices[0], self.test_config.servers[0], case.param[i].sharing_mr)
             commands.append(f"ssh {self.test_config.user}@{self.test_config.clients[0]} \
                             'cd {self.test_config.object_directory} && {clt_cmd} > test_result_c{i} &'&")
         self.execute_commands(commands)
+
+    def test(self, case):
+        self.start_test(case)
+        time.sleep(self.test_time)
+        self.stop_test()
