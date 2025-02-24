@@ -1,5 +1,6 @@
 import test_config
 import test_case
+import copy
 
 class analyzer:
     def __init__(self, config):
@@ -67,9 +68,49 @@ class analyzer:
                     return False
         return True
 
-    # calculate the difference betwen two cases
+    # calculate the difference between two cases
     def case_diff(self, case1: test_case, case2: test_case):
-        a = 1
+        diff = 0.0
+
+        # compress
+        temp_case1 = copy.deepcopy(case1)
+        temp_case2 = copy.deepcopy(case2)
+
+        # compress case 1
+        for i in range(len(temp_case1.param)):
+            for j in range(i + 1, len(temp_case1.param) - i):
+                if temp_case1.param[j].qp_num != 0:
+                    if temp_case1.param[j].service_type == temp_case1.param[i].service_type and \
+                        temp_case1.param[j].op == temp_case1.param[i].op and \
+                        temp_case1.param[j].msg_size == temp_case1.param[i].msg_size:
+                        temp_case1.param[i].qp_num += temp_case1.param[j].qp_num
+                        temp_case1.param[j].qp_num = 0
+
+        # compress case 2
+        for i in range(len(temp_case2.param)):
+            for j in range(i + 1, len(temp_case2.param) - i):
+                if temp_case2.param[j].qp_num != 0:
+                    if temp_case2.param[j].service_type == temp_case2.param[i].service_type and \
+                        temp_case2.param[j].op == temp_case2.param[i].op and \
+                        temp_case2.param[j].msg_size == temp_case2.param[i].msg_size:
+                        temp_case2.param[i].qp_num += temp_case2.param[j].qp_num
+                        temp_case2.param[j].qp_num = 0
+
+        # calculate
+        same_workload_num = 0
+        total_qp_num_1 = 0
+        total_qp_num_2 = 0
+        for param1 in temp_case1.param:
+            total_qp_num_1 += param1.qp_num
+        for param2 in temp_case2.param:
+            total_qp_num_2 += param2.qp_num
+        for param1 in temp_case1.param:
+            if param1.qp_num != 0:
+                for param2 in temp_case2.param:
+                    if param2.qp_num != 0:
+                        if param1.op == param2.op and param1.msg_size == param2.msg_size and param1.service_type == param2.service_type:
+                            same_workload_num += min(param1.qp_num, param2.qp_num)
+        return same_workload_num / ((total_qp_num_1 + total_qp_num_2) / 2)
 
     # calculate the message rate
     def parse_file_msg_rate(self, file_name, msg_sz):

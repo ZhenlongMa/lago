@@ -1,7 +1,7 @@
 class test_case:
     class process_param:
         size_list = [64, 1024, 16384]
-        qp_num_list = [4, 64, 1024]
+        qp_num_list = [4, 64, 4096]
         
         def __init__(self, qp_num: int, service_type: str, op: str, msg_size:int, sharing_mr: int):
             self.qp_num = qp_num
