@@ -49,18 +49,37 @@ class iterator:
                     # label it as -1 indicating that this parameter is irrelavant
 
                     # change qp num
-                    try_case.param[try_case.new_proc_id].qp_num = try_case.param[try_case.new_proc_id].qp_num / 2
+                    # 4 -> 4096
+                    # 64 -> 4096
+                    # 4096 -> 4
+                    # try_case.param[try_case.new_proc_id].qp_num = try_case.param[try_case.new_proc_id].qp_num / 2
+                    if try_case.param[try_case.new_proc_id].qp_num == 4:
+                        try_case.param[try_case.new_proc_id].qp_num = 4096
+                    elif try_case.param[try_case.new_proc_id].qp_num == 64:
+                        try_case.param[try_case.new_proc_id].qp_num = 4096
+                    elif try_case.param[try_case.new_proc_id].qp_num == 4096:
+                        try_case.param[try_case.new_proc_id].qp_num = 64
                     self.driver.test(try_case)
                     try_throughput = self.analyzer.calculate_throughput(try_case)
                     print(f"throughput: {try_throughput}")
+                    # if throughput is still less than 0.8, qp num is not the critical factor
                     if try_throughput < 0.8:
                         anomaly_case.param[anomaly_case.new_proc_id].qp_num = -1
 
                     # change msg size
-                    try_case.param[try_case.new_proc_id].msg_size = try_case.param[try_case.new_proc_id].msg_size / 2
+                    # 64 -> 16K
+                    # 1K -> 16K
+                    # 16K -> 64
+                    if try_case.param[try_case.new_proc_id].msg_size == 64:
+                        try_case.param[try_case.new_proc_id].msg_size = 16384
+                    elif try_case.param[try_case.new_proc_id].msg_size == 1024:
+                        try_case.param[try_case.new_proc_id].msg_size = 16384
+                    elif try_case.param[try_case.new_proc_id].msg_size == 16384:
+                        try_case.param[try_case.new_proc_id].msg_size = 64
                     self.driver.test(try_case)
                     try_throughput = self.analyzer.calculate_throughput(try_case)
                     print(f"throughput: {try_throughput}")
+                    # if throughput is still less than 0.8, message size is not the critical factor
                     if try_throughput < 0.8:
                         anomaly_case.param[anomaly_case.new_proc_id].msg_size = -1
 

@@ -4,9 +4,13 @@ class test_case:
         qp_num_list = [4, 64, 4096]
         
         def __init__(self, qp_num: int, service_type: str, op: str, msg_size:int, sharing_mr: int):
+            # qp_num == -1 means any QP number
             self.qp_num = qp_num
+            # available: RC, UC, UD, ANY
             self.service_type = service_type
+            # available: WRITE, READ, ANY
             self.op = op
+            # msg_sie == -1 means any message size
             self.msg_size = msg_size
             self.sharing_mr = sharing_mr
             

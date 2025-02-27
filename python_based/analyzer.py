@@ -110,6 +110,7 @@ class analyzer:
                     if param2.qp_num != 0:
                         if param1.op == param2.op and param1.msg_size == param2.msg_size and param1.service_type == param2.service_type:
                             same_workload_num += min(param1.qp_num, param2.qp_num)
+                            
         return same_workload_num / ((total_qp_num_1 + total_qp_num_2) / 2)
 
     # calculate the message rate
