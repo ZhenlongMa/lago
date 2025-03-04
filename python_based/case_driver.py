@@ -42,7 +42,7 @@ class case_driver:
             time.sleep(1)
         print("process cleaned!")
 
-    def generate_command(self, base_cmd, qp_num, msg_sz, port, device, server_ip=None, sharing_mr):
+    def generate_command(self, base_cmd, qp_num, msg_sz, port, device, server_ip = None, sharing_mr = 0):
         cmd = (
             f"{base_cmd} -p {port} -d {device} -i 1 -l {self.test_config.wqe_num} -m {self.test_config.mtu} "
             f"-c RC -q {qp_num} -F -s {msg_sz} --run_infinitely"

@@ -13,7 +13,7 @@ class iterator:
         self.reach_destination = False
         self.analyzer = analyzer
         self.anomaly_id = 0
-        self.anonaly_case = []
+        self.anomaly_case = []
 
     def record_case_throughput(self, case: test_case.test_case, throughput: float):
         print(f"anomaly ID: {self.anomaly_id}, throughput: {throughput}")
@@ -91,11 +91,19 @@ class iterator:
                             anomaly_case.param[anomaly_case.new_proc_id].sharing_mr = -1
                     else:
                         anomaly_case.param[anomaly_case.new_proc_id].sharing_mr = -1
-                    self.anonaly_case.append(anomaly_case)
+                    self.anomaly_case.append(anomaly_case)
                     self.record_case_throughput(case, throughput)
+
+                    # mutate the case
+                    self.mutate_process(anomaly_case.new_proc_id)
+
                 case = self.set_next_case(case, start_case, self.config.terminus)
                 if case == None:
                     break
+
+    # cancel the process leading to an anomaly
+    def mutate_process(self, param_index):
+        self.config.terminus.param[param_index].qp_num = 0
 
     def set_start_case(self):
         start_case = test_case.test_case()
@@ -120,13 +128,40 @@ class iterator:
     def set_next_case(self, current_case, original_case, final_case):
         next_case = copy.deepcopy(current_case)
         invalid_process_index = []
-        for i in range(len(current_case.param)):
-            if current_case.param[i].qp_num == 0:
-                invalid_process_index.append(i)
-        if len(invalid_process_index) == 0:
-            return None
+
+        # if no anomaly is detected, randomly choose a process from the final case
+        if len(self.anomaly_case) == 0:
+            for i in range(len(current_case.param)):
+                if current_case.param[i].qp_num == 0:
+                    invalid_process_index.append(i)
+            if len(invalid_process_index) == 0:
+                return None
+            else:
+                random_process = random.choice(invalid_process_index)
+                next_case.param[random_process] = copy.deepcopy(final_case.param[random_process])
+                next_case.new_proc_id = random_process
+                return next_case
         else:
-            random_process = random.choice(invalid_process_index)
-            next_case.param[random_process] = copy.deepcopy(final_case.param[random_process])
-            next_case.new_proc_id = random_process
+            candidate_index = []
+            # indexed according to the final case
+            distance_to_anomaly = []
+            # calculate each candidate's distance to anomaly
+            for i in range(len(current_case)):
+                if current_case.param[i].qp_num == 0:
+                    candidate_index.append(i)
+                    dist = -1
+                    current_case.param[i].qp_num = final_case.param[i].qp_num
+                    for j in range(len(self.anomaly_case)):
+                        if dist == -1:
+                            dist = analyzer.case_diff(self.anomaly_case, current_case)
+                        else:
+                            dist = min(dist, analyzer.case_diff(self.anomaly_case, current_case))
+                        current_case.param[i].qp_num = 0
+                    distance_to_anomaly.append(dist)
+                else:
+                    distance_to_anomaly.append(-1)
+            assert len(distance_to_anomaly) > 0
+            max_dist = max(distance_to_anomaly)
+            max_index = distance_to_anomaly.index(max_dist)
+            next_case.param[max_index] = copy.deepcopy(final_case.param[max_index])
             return next_case

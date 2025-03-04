@@ -69,6 +69,7 @@ class analyzer:
         return True
 
     # calculate the difference between two cases
+    todo: consider non-critical factors
     def case_diff(self, case1: test_case, case2: test_case):
         diff = 0.0
 
