@@ -67,46 +67,33 @@ class analyzer:
                 if case1.param[i].sharing_mr == 0 and case2.param[i].sharing_mr == 1:
                     return False
         return True
-    
-    # def compress_case(self, case):
 
     # calculate the difference between two cases
     todo: consider non-critical factors
     def case_diff(self, case1: test_case, case2: test_case):
-        diff = 0.0
+
+        def compress_case(self, temp_case1):
+            for i in range(len(temp_case1.param)):
+                if temp_case1.param[i].qp_num != 0:
+                    for j in range(i + 1, len(temp_case1.param)):
+                        if temp_case1.param[j].qp_num != 0:
+                            if temp_case1.param[j].service_type == temp_case1.param[i].service_type and \
+                                temp_case1.param[j].op == temp_case1.param[i].op and \
+                                temp_case1.param[j].msg_size == temp_case1.param[i].msg_size:
+                                if temp_case1.param[j].qp_num == -1 or temp_case1.param[i].qp_num == -1:
+                                    temp_case1.param[i].qp_num = -1
+                                    temp_case1.param[j].qp_num = 0
+                                else:
+                                    temp_case1.param[i].qp_num += temp_case1.param[j].qp_num
+                                    temp_case1.param[j].qp_num = 0
 
         # compress
         temp_case1 = copy.deepcopy(case1)
         temp_case2 = copy.deepcopy(case2)
-        # compressed_case1 = compress_case(case1)
-        # compressed_case2 = compress_case(case2)
+        compress_case(temp_case1)
+        compress_case(temp_case2)
 
-        # compress case 1
-        for i in range(len(temp_case1.param)):
-            if temp_case1.param[i].qp_num != 0:
-                for j in range(i + 1, len(temp_case1.param) - i):
-                    if temp_case1.param[j].qp_num != 0:
-                        if temp_case1.param[j].service_type == temp_case1.param[i].service_type and \
-                            temp_case1.param[j].op == temp_case1.param[i].op and \
-                            temp_case1.param[j].msg_size == temp_case1.param[i].msg_size:
-                            if temp_case1.param[j].qp_num == -1 or temp_case1.param[i].qp_num == -1:
-                                temp_case1.param[i].qp_num = -1
-                                temp_case1.param[j].qp_num = 0
-                            else:
-                                temp_case1.param[i].qp_num += temp_case1.param[j].qp_num
-                                temp_case1.param[j].qp_num = 0
-
-        # compress case 2
-        for i in range(len(temp_case2.param)):
-            for j in range(i + 1, len(temp_case2.param) - i):
-                if temp_case2.param[j].qp_num != 0:
-                    if temp_case2.param[j].service_type == temp_case2.param[i].service_type and \
-                        temp_case2.param[j].op == temp_case2.param[i].op and \
-                        temp_case2.param[j].msg_size == temp_case2.param[i].msg_size:
-                        temp_case2.param[i].qp_num += temp_case2.param[j].qp_num
-                        temp_case2.param[j].qp_num = 0
-
-        # calculate
+        # calculate distance
         # warning: what if param2.qp_num is -1?
         same_workload_num = 0
         total_qp_num_1 = 0
@@ -119,11 +106,21 @@ class analyzer:
                 total_qp_num_2 += param2.qp_num
         for param1 in temp_case1.param:
             if param1.qp_num != 0:
+                assert param1.qp_num > 0
+                assert param1.op != "ANY"
+                assert param1.service_type != "ANY"
+                assert param1.msg_size != -1
                 for param2 in temp_case2.param:
                     if param2.qp_num != 0:
                         # modify here
-                        if param1.op == param2.op and param1.msg_size == param2.msg_size and param1.service_type == param2.service_type:
-                            same_workload_num += min(param1.qp_num, param2.qp_num)
+                        if (param1.op == param2.op or param2.op == "ANY") and \
+                            (param1.msg_size == param2.msg_size or param2.msg_size == -1) and \
+                            (param1.service_type == param2.service_type or param2.service_type == "ANY"):
+                            if param2.qp_num == -1:
+                                total_qp_num_2 += param1.qp_num
+                                same_workload_num += param1.qp_num
+                            else:
+                                same_workload_num += min(param1.qp_num, param2.qp_num)
                             
         return same_workload_num / ((total_qp_num_1 + total_qp_num_2) / 2)
 
