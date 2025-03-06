@@ -3,14 +3,14 @@ class test_case:
         size_list = [64, 1024, 16384]
         qp_num_list = [4, 64, 4096]
         
-        def __init__(self, qp_num: int, service_type: str, op: str, msg_size:int, sharing_mr: int):
+        def __init__(self, qp_num: int, service_type: str, op: str, msg_size:int, sharing_mr: int, bidirection = 0):
             # qp_num == -1 means any QP number
             self.qp_num = qp_num
             # available: RC, UC, UD, ANY
             self.service_type = service_type
             # available: WRITE, READ, ANY
             self.op = op
-            # msg_sie == -1 means any message size
+            # msg_size == -1 means any message size
             self.msg_size = msg_size
             self.sharing_mr = sharing_mr
             
@@ -32,6 +32,7 @@ class test_case:
         result = 0
         for i in range(len(self.param)):
             if self.param[i].qp_num != 0:
+                assert self.param[i].qp_num != -1
                 result += 1
         return result
     
