@@ -5,6 +5,7 @@ class test_case:
         
         def __init__(self, qp_num: int, service_type: str, op: str, msg_size:int, sharing_mr: int, bidirection = 0):
             # qp_num == -1 means any QP number
+            # qp_num == -2 means abandoned param
             self.qp_num = qp_num
             # available: RC, UC, UD, ANY
             self.service_type = service_type

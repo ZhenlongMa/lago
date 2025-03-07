@@ -28,13 +28,22 @@ class iterator:
         anomaly_file.close()
         self.anomaly_id += 1
 
+    # if all processes' QP number is positive or -2, the test reaches the end because each process is 
+    # either tested or abandoned
+    def reach_end(self, case, terminus):
+        for param in case.param:
+            assert param.qp_num != -1
+            if param.qp_num == 0:
+                return False
+        return True
+
     def launch_test(self):
         # in the whole test, iterate for several times
         for i in range(self.config.round_num):
             print(f"start round {i}")
             start_case = self.set_start_case()
             case = start_case
-            while self.analyzer.case_larger(case, self.config.terminus) != True: # if the test case doesn't exceed terminus
+            while True: # if the test case doesn't exceed terminus
                 self.driver.test(case) # run test and generate test_result_xx files
                 throughput = self.analyzer.calculate_throughput(case)
                 print(f"throughput: {throughput}")
@@ -97,6 +106,8 @@ class iterator:
                     # mutate the case
                     # self.mutate_process(anomaly_case.new_proc_id)
 
+                if reach_end(case, self.config.terminus):
+                    break
                 case = self.set_next_case(case, start_case, self.config.terminus)
                 if case == None:
                     break
@@ -156,6 +167,7 @@ class iterator:
                             dist = analyzer.case_diff(self.anomaly_case, current_case)
                         else:
                             dist = min(dist, analyzer.case_diff(self.anomaly_case, current_case))
+                        assert dist >= 0
                         current_case.param[i].qp_num = 0
                     distance_to_anomaly.append(dist)
                 else:
