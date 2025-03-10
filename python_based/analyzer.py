@@ -69,9 +69,7 @@ class analyzer:
         return True
 
     # calculate the difference between two cases
-    todo: consider non-critical factors
     def case_diff(self, case1: test_case, case2: test_case):
-
         def compress_case(self, temp_case1):
             for i in range(len(temp_case1.param)):
                 if temp_case1.param[i].qp_num != 0:
@@ -94,7 +92,6 @@ class analyzer:
         compress_case(temp_case2)
 
         # calculate distance
-        # warning: what if param2.qp_num is -1?
         same_workload_num = 0
         total_qp_num_1 = 0
         total_qp_num_2 = 0
