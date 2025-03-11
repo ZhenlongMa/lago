@@ -46,9 +46,6 @@ class analyzer:
                 bias += (max_bps / len(self.qp_bps_vec) - self.qp_bps_vec[i]) / len(self.qp_bps_vec) / (max_bps / len(self.qp_bps_vec))
         return 1 - bias
 
-        # map the throughput to the case
-        # todo
-
     def judge_anomaly(self, case):
         if self.calculate_throughput(case) < 0.8:
             return True
@@ -118,7 +115,8 @@ class analyzer:
                                 same_workload_num += param1.qp_num
                             else:
                                 same_workload_num += min(param1.qp_num, param2.qp_num)
-                            
+        print(f"distance: {same_workload_num / ((total_qp_num_1 + total_qp_num_2) / 2)}")
+        assert same_workload_num / ((total_qp_num_1 + total_qp_num_2) / 2) <= 1
         return same_workload_num / ((total_qp_num_1 + total_qp_num_2) / 2)
 
     # calculate the message rate

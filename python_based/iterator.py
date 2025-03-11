@@ -103,10 +103,7 @@ class iterator:
                     self.anomaly_case.append(anomaly_case)
                     self.record_case_throughput(case, throughput)
 
-                    # mutate the case
-                    # self.mutate_process(anomaly_case.new_proc_id)
-
-                if reach_end(case, self.config.terminus):
+                if self.reach_end(case, self.config.terminus):
                     break
                 case = self.set_next_case(case, start_case, self.config.terminus)
                 if case == None:
