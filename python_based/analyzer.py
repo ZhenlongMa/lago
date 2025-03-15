@@ -36,13 +36,16 @@ class analyzer:
         max_bps = 100000.00 # Mbps
         max_pps = 64000.00 # Mpps
         bias = 0
+        print(f"len(self.qp_bps_vec): {len(self.qp_bps_vec)}, len(case.param): {len(case.param)}")
+        print(f"len(self.qp_bps_vec): {len(self.qp_bps_vec)}, case.count_total_qp_num(): {case.count_total_qp_num()}")
+        assert len(self.qp_bps_vec) <= case.count_total_qp_num()
         for i in range(len(self.qp_bps_vec)):
             # todo: decide whether using bps or pps
             if self.qp_bps_vec[i] > max_bps / len(self.qp_bps_vec):
                 bias += 0
             else:
                 expected = max_bps / len(self.qp_bps_vec)
-                print(f"max_bps: {max_bps}, length: {len(self.qp_bps_vec)}, bps: {self.qp_bps_vec[i]}")
+                # print(f"max_bps: {max_bps}, length: {len(self.qp_bps_vec)}, bps: {self.qp_bps_vec[i]}")
                 bias += (max_bps / len(self.qp_bps_vec) - self.qp_bps_vec[i]) / len(self.qp_bps_vec) / (max_bps / len(self.qp_bps_vec))
         return 1 - bias
 
@@ -67,7 +70,8 @@ class analyzer:
 
     # calculate the difference between two cases
     def case_diff(self, case1: test_case, case2: test_case):
-        def compress_case(self, temp_case1):
+
+        def compress_case(temp_case1: test_case):
             for i in range(len(temp_case1.param)):
                 if temp_case1.param[i].qp_num != 0:
                     for j in range(i + 1, len(temp_case1.param)):

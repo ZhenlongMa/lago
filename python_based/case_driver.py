@@ -8,7 +8,7 @@ class case_driver:
 
     def __init__(self, test_config: test_config.test_config):
         self.test_config = test_config
-        self.test_time = 10 # seconds
+        self.test_time = 20 # seconds
 
     def stop_test(self):
         print("Cleaning perftest processes...")

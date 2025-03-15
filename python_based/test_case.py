@@ -37,3 +37,16 @@ class test_case:
                 result += 1
         return result
     
+    def count_total_qp_num(self):
+        result = 0
+        for param in self.param:
+            assert param.qp_num >= 0
+            result += param.qp_num
+        return result
+    
+    def count_valid_qp_num(self):
+        result = 0
+        for param in self.param:
+            if param.qp_num >= 0:
+                result += param.qp_num
+        return result

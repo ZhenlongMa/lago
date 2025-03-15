@@ -7,7 +7,7 @@ import random
 import time
 
 class iterator:
-    def __init__(self, config: test_config, driver: case_driver, analyzer: analyzer.analyzer):
+    def __init__(self, config: test_config, driver: case_driver, analyzer: analyzer):
         self.config = config
         self.driver = driver
         self.reach_destination = False
@@ -44,6 +44,8 @@ class iterator:
             start_case = self.set_start_case()
             case = start_case
             while True: # if the test case doesn't exceed terminus
+                print(f"case valid qp num: {case.count_valid_qp_num()}, terminus valid qp num: {self.config.terminus.count_valid_qp_num()}")
+                assert case.count_valid_qp_num() <= self.config.terminus.count_valid_qp_num()
                 self.driver.test(case) # run test and generate test_result_xx files
                 throughput = self.analyzer.calculate_throughput(case)
                 print(f"throughput: {throughput}")
@@ -101,7 +103,7 @@ class iterator:
                     else:
                         anomaly_case.param[anomaly_case.new_proc_id].sharing_mr = -1
                     self.anomaly_case.append(anomaly_case)
-                    self.record_case_throughput(case, throughput)
+                    self.record_case_throughput(anomaly_case, throughput)
 
                 if self.reach_end(case, self.config.terminus):
                     break
@@ -150,20 +152,18 @@ class iterator:
                 next_case.new_proc_id = random_process
                 return next_case
         else:
-            candidate_index = []
             # indexed according to the final case
             distance_to_anomaly = []
             # calculate each candidate's distance to anomaly
-            for i in range(len(current_case)):
+            for i in range(len(current_case.param)):
                 if current_case.param[i].qp_num == 0:
-                    candidate_index.append(i)
                     dist = -1
                     current_case.param[i].qp_num = final_case.param[i].qp_num
                     for j in range(len(self.anomaly_case)):
                         if dist == -1:
-                            dist = analyzer.case_diff(self.anomaly_case, current_case)
+                            dist = self.analyzer.case_diff(current_case, self.anomaly_case[j])
                         else:
-                            dist = min(dist, analyzer.case_diff(self.anomaly_case, current_case))
+                            dist = min(dist, self.analyzer.case_diff(current_case, self.anomaly_case[j]))
                         assert dist >= 0
                         current_case.param[i].qp_num = 0
                     distance_to_anomaly.append(dist)
@@ -172,5 +172,6 @@ class iterator:
             assert len(distance_to_anomaly) > 0
             max_dist = max(distance_to_anomaly)
             max_index = distance_to_anomaly.index(max_dist)
+            assert current_case.param[max_index].qp_num == 0
             next_case.param[max_index] = copy.deepcopy(final_case.param[max_index])
             return next_case
