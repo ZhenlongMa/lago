@@ -12,7 +12,7 @@ class iterator:
         self.driver = driver
         self.reach_destination = False
         self.analyzer = analyzer
-        self.anomaly_id = 0
+        self.anomaly_id = self.analyzer.max_anomaly_index + 1
         self.anomaly_case = []
 
     def record_case_throughput(self, case: test_case.test_case, throughput: float):

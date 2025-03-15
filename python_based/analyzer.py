@@ -1,10 +1,13 @@
 import test_config
 import test_case
 import copy
+import os
+import re
 
 class analyzer:
     def __init__(self, config):
         self.config = config
+        self.max_anomaly_index = self.get_anomaly_file_max_index()
 
     # calculate the throughput of the current case.
     # the input is the case
@@ -143,3 +146,15 @@ class analyzer:
             raise Exception(f"no result in {file_name}!")
         else:
             return (sum(res) / len(res))
+
+    def get_anomaly_file_max_index(self):
+        max_index = 0
+        pattern = re.compile(r'^anomaly_(\d+)')
+        for filename in os.listdir("."):
+            match = pattern.match(filename)
+            if match:
+                num = int(match.group(1))
+                if num > max_index:
+                    max_index = num
+        print(f"Anomaly files start from {max_index}")
+        return max_index

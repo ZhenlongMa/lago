@@ -9,7 +9,7 @@ import analyzer
 
 def main():
     # remove result files
-    os.system("rm test_result_* anomaly*")
+    os.system("rm test_result_*")
     config = tc.test_config("28")
     # config.init_case()
     performance_analyzer = analyzer.analyzer(config)
