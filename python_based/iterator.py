@@ -102,6 +102,15 @@ class iterator:
                             anomaly_case.param[anomaly_case.new_proc_id].sharing_mr = -1
                     else:
                         anomaly_case.param[anomaly_case.new_proc_id].sharing_mr = -1
+
+                    if try_case.param[try_case.new_proc_id].op == "WRITE":
+                        try_case.param[try_case.new_proc_id].op = "READ"
+                    elif try_case.param[try_case.new_proc_id].op == "READ":
+                        try_case.param[try_case.new_proc_id].op = "WRITE"
+                    try_throughput = self.analyzer.calculate_throughput(try_case)
+                    if try_throughput < 0.8:
+                        anomaly_case.param[anomaly_case.new_proc_id].op = "ANY"
+
                     self.anomaly_case.append(anomaly_case)
                     self.record_case_throughput(anomaly_case, throughput)
 
