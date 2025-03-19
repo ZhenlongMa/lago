@@ -4,6 +4,11 @@ class test_case:
         qp_num_list = [4, 64, 4096]
         
         def __init__(self, qp_num: int, service_type: str, op: str, msg_size:int, sharing_mr: int, bidirection = 0):
+            assert isinstance(qp_num, int)
+            assert isinstance(service_type, str)
+            assert isinstance(op, str)
+            assert isinstance(msg_size, int)
+            assert isinstance(sharing_mr, int)
             # qp_num == -1 means any QP number
             # qp_num == -2 means abandoned param
             self.qp_num = qp_num
@@ -50,3 +55,8 @@ class test_case:
             if param.qp_num >= 0:
                 result += param.qp_num
         return result
+    
+    def print_case_info(self):
+        for i in range(len(self.param)):
+            print(f"qp_num: {self.param[i].qp_num}, svc_typ: {self.param[i].service_type}, op: {self.param[i].op}, msg_size: {self.param[i].msg_size}, \
+                  sharing_mr: {self.param[i].sharing_mr}")
