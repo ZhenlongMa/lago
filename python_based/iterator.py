@@ -43,9 +43,11 @@ class iterator:
         # in the whole test, iterate for several times
         for i in range(self.config.round_num):
             print(f"start round {i}")
-            start_case = self.set_start_case()
-            case = start_case
+            case = self.set_start_case()
+            case = self.set_next_case(case, self.config.terminus)
             while True: # if the test case doesn't exceed terminus
+                if case == None:
+                    break
                 print(f"case valid qp num: {case.count_valid_qp_num()}, terminus valid qp num: {self.config.terminus.count_valid_qp_num()}")
                 assert case.count_valid_qp_num() <= self.config.terminus.count_valid_qp_num()
                 self.driver.test(case) # run test and generate test_result_xx files
@@ -118,9 +120,9 @@ class iterator:
 
                 if self.reach_end(case, self.config.terminus):
                     break
-                case = self.set_next_case(case, start_case, self.config.terminus)
-                if case == None:
-                    break
+                case = self.set_next_case(case, self.config.terminus)
+                # if case == None:
+                #     break
 
     # cancel the process leading to an anomaly
     def mutate_process(self, param_index):
@@ -133,25 +135,27 @@ class iterator:
         # to do: generate the start case
         for i in range(len(self.config.terminus.param)):
             # param = start_case.process_param(1, "RC", "WRITE", 64, False)
-            param = start_case.process_param(0, self.config.terminus.param[i].service_type, self.config.terminus.param[i].op, 0, False)
+            # param = copy.deepcopy(self.config.terminus)
+            param = start_case.process_param(0, self.config.terminus.param[i].service_type, self.config.terminus.param[i].op, self.config.terminus.param[i].msg_size, 0)
             start_case.param.append(param)
 
         # temp setting: copy the terminus qp num
-        qp_num = self.config.terminus.param[0].qp_num
-        start_case.param[0].qp_num = qp_num
-        start_case.param[0].msg_size = self.config.terminus.param[0].msg_size
-        start_case.param[0].sharing_mr = self.config.terminus.param[0].sharing_mr
-        start_case.new_proc_id = 0
+        # qp_num = self.config.terminus.param[0].qp_num
+        # start_case.param[0].qp_num = qp_num
+        # start_case.param[0].msg_size = self.config.terminus.param[0].msg_size
+        # start_case.param[0].sharing_mr = self.config.terminus.param[0].sharing_mr
+        # start_case.new_proc_id = 0
         return start_case
 
     # set the next case to run according to the current case, the original case, the final case, 
     # and the throughput anomaly
-    def set_next_case(self, current_case, original_case, final_case):
-        next_case = copy.deepcopy(current_case)
-        invalid_process_index = []
+    def set_next_case(self, current_case, final_case):
 
         # if no anomaly is detected, randomly choose a process from the final case
         if len(self.anomaly_case) == 0:
+            print("No anomaly found! Random pick!")
+            next_case = copy.deepcopy(current_case)
+            invalid_process_index = []
             for i in range(len(current_case.param)):
                 if current_case.param[i].qp_num == 0:
                     invalid_process_index.append(i)
@@ -163,30 +167,76 @@ class iterator:
                 next_case.new_proc_id = random_process
                 return next_case
         else:
-            # indexed according to the final case
-            distance_to_anomaly = []
-            # calculate each candidate's distance to anomaly
-            for i in range(len(current_case.param)):
-                if current_case.param[i].qp_num == 0:
-                    dist = -1
-                    current_case.param[i].qp_num = final_case.param[i].qp_num
-                    for j in range(len(self.anomaly_case)):
-                        if dist == -1:
-                            dist = self.analyzer.case_diff(current_case, self.anomaly_case[j])
-                        else:
-                            dist = min(dist, self.analyzer.case_diff(current_case, self.anomaly_case[j]))
-                        assert dist >= 0
-                        current_case.param[i].qp_num = 0
-                    distance_to_anomaly.append(dist)
-                else:
-                    distance_to_anomaly.append(-1)
-            assert len(distance_to_anomaly) > 0
-            max_dist = max(distance_to_anomaly)
-            max_index = distance_to_anomaly.index(max_dist)
-            assert current_case.param[max_index].qp_num == 0
-            next_case.param[max_index] = copy.deepcopy(final_case.param[max_index])
-            next_case.new_proc_id = max_index
-            return next_case
+            print(f"Found {len(self.anomaly_case)} anomaly records!")
+            while 1:
+                next_case = copy.deepcopy(current_case)
+                # indexed according to the final case
+                distance_to_anomaly = []
+                # calculate each candidate's distance to anomaly
+                for i in range(len(current_case.param)):
+                    if current_case.param[i].qp_num == 0:
+                        dist = -1
+                        current_case.param[i].qp_num = final_case.param[i].qp_num
+                        for j in range(len(self.anomaly_case)):
+                            assert current_case.param[i].qp_num != 0
+                            if dist == -1:
+                                dist = self.analyzer.case_diff(current_case, self.anomaly_case[j])
+                            else:
+                                dist = min(dist, self.analyzer.case_diff(current_case, self.anomaly_case[j]))
+                            assert dist >= 0
+                        distance_to_anomaly.append(dist)
+                    else:
+                        distance_to_anomaly.append(-1)
+                    current_case.param[i].qp_num = 0
+                assert len(distance_to_anomaly) > 0
+                print(distance_to_anomaly)
+                max_dist = max(distance_to_anomaly)
+                print(f"max distance: {max_dist}")
+                max_index = distance_to_anomaly.index(max_dist)
+                assert current_case.param[max_index].qp_num == 0
+                next_case.param[max_index] = copy.deepcopy(final_case.param[max_index])
+                print(f"next case:")
+                next_case.print_case_info()
+                next_case.new_proc_id = max_index
+                current_case = copy.deepcopy(next_case)
+                if max_dist != 0:
+                    assert max_dist > 0
+                    return next_case
+                elif self.reach_end(next_case, self.config.terminus):
+                    return None
+
+            # print(f"Found {len(self.anomaly_case)} anomaly records!")
+            # next_case = copy.deepcopy(current_case)
+            # # indexed according to the final case
+            # distance_to_anomaly = []
+            # # calculate each candidate's distance to anomaly
+            # for i in range(len(current_case.param)):
+            #     if current_case.param[i].qp_num == 0:
+            #         dist = -1
+            #         current_case.param[i].qp_num = final_case.param[i].qp_num
+            #         for j in range(len(self.anomaly_case)):
+            #             assert current_case.param[i].qp_num != 0
+            #             if dist == -1:
+            #                 dist = self.analyzer.case_diff(current_case, self.anomaly_case[j])
+            #             else:
+            #                 dist = min(dist, self.analyzer.case_diff(current_case, self.anomaly_case[j]))
+            #             assert dist >= 0
+            #         distance_to_anomaly.append(dist)
+            #     else:
+            #         distance_to_anomaly.append(-1)
+            #     current_case.param[i].qp_num = 0
+            # assert len(distance_to_anomaly) > 0
+            # print(distance_to_anomaly)
+            # max_dist = max(distance_to_anomaly)
+            # print(f"max distance: {max_dist}")
+            # max_index = distance_to_anomaly.index(max_dist)
+            # assert current_case.param[max_index].qp_num == 0
+            # next_case.param[max_index] = copy.deepcopy(final_case.param[max_index])
+            # print(f"next case:")
+            # next_case.print_case_info()
+            # next_case.new_proc_id = max_index
+            # return next_case
+
         
     def read_history_anomalies(self):
         anomaly_path = "./"
@@ -203,10 +253,11 @@ class iterator:
                     # print(line_list)
                     if next_active == 1:
                         # anomaly param format: qp_num svc_type op msg_size sharing_mr
-                        param = existing_anomaly_case.process_param(line_list[0], line_list[1], line_list[2], line_list[3], line_list[4])
-                        self.anomaly_case.append(param)
+                        param = existing_anomaly_case.process_param(int(line_list[0]), line_list[1], line_list[2], int(line_list[3]), int(line_list[4]))
+                        existing_anomaly_case.param.append(param)
                     if line_list[0] == "qp_num":
                         next_active = 1
                 if next_active == 0:
                     raise Exception("Empty anomaly file!")
+                self.anomaly_case.append(existing_anomaly_case)
             # raise Exception("temp")
