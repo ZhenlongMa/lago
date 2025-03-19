@@ -58,5 +58,5 @@ class test_case:
     
     def print_case_info(self):
         for i in range(len(self.param)):
-            print(f"qp_num: {self.param[i].qp_num}, svc_typ: {self.param[i].service_type}, op: {self.param[i].op}, msg_size: {self.param[i].msg_size}, \
-                  sharing_mr: {self.param[i].sharing_mr}")
+            print(f"qp_num: {self.param[i].qp_num}, svc_typ: {self.param[i].service_type}, op: {self.param[i].op}, msg_size: {self.param[i].msg_size}, "\
+                  f"sharing_mr: {self.param[i].sharing_mr}")
