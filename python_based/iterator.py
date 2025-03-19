@@ -38,6 +38,7 @@ class iterator:
         return True
 
     def launch_test(self):
+        self.read_history_anomalies()
         # in the whole test, iterate for several times
         for i in range(self.config.round_num):
             print(f"start round {i}")
@@ -184,3 +185,23 @@ class iterator:
             assert current_case.param[max_index].qp_num == 0
             next_case.param[max_index] = copy.deepcopy(final_case.param[max_index])
             return next_case
+        
+    def read_history_anomalies(self):
+        anomaly_path = "./"
+        for anomaly_id in range(self.anomaly_id):
+            filename = f"anomaly_{anomaly_id}"
+            with open(filename, "r") as f:
+                next_active = 0
+                existing_anomaly_case = test_case.test_case()
+                print(f"open {filename}")
+                for line in f.readlines:
+                    line = line.strip()
+                    line_list = line.split(' ')
+                    if next_active == 1:
+                        # anomaly param format: qp_num svc_type op msg_size sharing_mr
+                        param = existing_anomaly_case.process_param(line_list[0], line_list[1], line_list[2], line_list[3], line_list[4])
+                        self.anomaly_case.append(param)
+                    if line_list[0] == "qp_num":
+                        next_active = 1
+                if next_active == 0:
+                    raise Exception("Empty anomaly file!")
