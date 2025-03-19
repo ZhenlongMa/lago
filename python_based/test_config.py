@@ -79,7 +79,7 @@ class test_config:
         # todo: server side launch
         for i in range(3):
             param = self.terminus.process_param(qp_num = 4, service_type = "RC", op = "READ", \
-                                                msg_size = 65536, sharing_mr = 1)
+                                                msg_size = 64, sharing_mr = 1)
             self.terminus.param.append(param)
         for i in range(2):
             param = self.terminus.process_param(qp_num = 4, service_type = "RC", op = "WRITE", \
