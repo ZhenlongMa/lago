@@ -148,7 +148,7 @@ class analyzer:
             return (sum(res) / len(res))
 
     def get_anomaly_file_max_index(self):
-        max_index = 0
+        max_index = -1
         pattern = re.compile(r'^anomaly_(\d+)')
         for filename in os.listdir("."):
             match = pattern.match(filename)
