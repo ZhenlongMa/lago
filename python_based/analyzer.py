@@ -73,7 +73,7 @@ class analyzer:
 
     # calculate the difference between two cases
     def case_diff(self, case1: test_case, case2: test_case):
-
+        # print("into case_diff!")
         def compress_case(temp_case1: test_case):
             for i in range(len(temp_case1.param)):
                 if temp_case1.param[i].qp_num != 0:
@@ -102,29 +102,40 @@ class analyzer:
         for param1 in temp_case1.param:
             assert param1.qp_num != -1
             total_qp_num_1 += param1.qp_num
+            # print(f"total_qp_num_1: {total_qp_num_1}")
         for param2 in temp_case2.param:
             if param2.qp_num != -1:
                 total_qp_num_2 += param2.qp_num
+                
         for param1 in temp_case1.param:
+            # print("probe1")
             if param1.qp_num != 0:
+                # print("probe2")
                 assert param1.qp_num > 0
                 assert param1.op != "ANY"
                 assert param1.service_type != "ANY"
                 assert param1.msg_size != -1
                 for param2 in temp_case2.param:
+                    # print("probe3")
                     if param2.qp_num != 0:
+                        # print("probe4")
+                        # print(f"{param1.op}, {param2.op}, {param1.msg_size}, {param2.msg_size}, {param1.service_type}, {param2.service_type}")
                         # modify here
                         if (param1.op == param2.op or param2.op == "ANY") and \
                             (param1.msg_size == param2.msg_size or param2.msg_size == -1) and \
                             (param1.service_type == param2.service_type or param2.service_type == "ANY"):
+                            # print("probe5")
                             if param2.qp_num == -1:
                                 total_qp_num_2 += param1.qp_num
                                 same_workload_num += param1.qp_num
                             else:
                                 same_workload_num += min(param1.qp_num, param2.qp_num)
-        print(f"distance: {same_workload_num / ((total_qp_num_1 + total_qp_num_2) / 2)}")
+        # print(f"same_workload_num: {same_workload_num}")
+        # print(f"total_qp_num_1: {total_qp_num_1}")
+        # print(f"total_qp_num_2: {total_qp_num_2}")
+        print(f"distance: {1 - same_workload_num / ((total_qp_num_1 + total_qp_num_2) / 2)}")
         assert same_workload_num / ((total_qp_num_1 + total_qp_num_2) / 2) <= 1
-        return same_workload_num / ((total_qp_num_1 + total_qp_num_2) / 2)
+        return 1 - same_workload_num / ((total_qp_num_1 + total_qp_num_2) / 2)
 
     # calculate the message rate
     def parse_file_msg_rate(self, file_name, msg_sz):
