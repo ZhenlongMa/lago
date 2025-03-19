@@ -5,6 +5,7 @@ import test_case
 import copy
 import random
 import time
+import re
 
 class iterator:
     def __init__(self, config: test_config, driver: case_driver, analyzer: analyzer):
@@ -184,6 +185,7 @@ class iterator:
             max_index = distance_to_anomaly.index(max_dist)
             assert current_case.param[max_index].qp_num == 0
             next_case.param[max_index] = copy.deepcopy(final_case.param[max_index])
+            next_case.new_proc_id = max_index
             return next_case
         
     def read_history_anomalies(self):
@@ -194,9 +196,11 @@ class iterator:
                 next_active = 0
                 existing_anomaly_case = test_case.test_case()
                 print(f"open {filename}")
-                for line in f.readlines:
+                for line in f.readlines():
                     line = line.strip()
-                    line_list = line.split(' ')
+                    # line_list = line.split(' ')
+                    line_list = re.split(r'[ \t]+', line)
+                    # print(line_list)
                     if next_active == 1:
                         # anomaly param format: qp_num svc_type op msg_size sharing_mr
                         param = existing_anomaly_case.process_param(line_list[0], line_list[1], line_list[2], line_list[3], line_list[4])
@@ -205,3 +209,4 @@ class iterator:
                         next_active = 1
                 if next_active == 0:
                     raise Exception("Empty anomaly file!")
+            # raise Exception("temp")
