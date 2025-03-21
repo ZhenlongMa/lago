@@ -20,6 +20,11 @@ class iterator:
         print(f"anomaly ID: {self.anomaly_id}, throughput: {throughput}")
         anomaly_file = open(f"anomaly_{self.anomaly_id}", "w")
         anomaly_file.write(f"Throughput: {throughput}\n")
+        anomaly_file.write(f"anomaly process id: {case.new_proc_id}\n")
+        anomaly_file.write(f"fatal param: ")
+        for i in range(len(case.anomaly_param)):
+            anomaly_file.write(f"{case.anomaly_param[i]} ")
+        anomaly_file.write(f"\n")
         anomaly_file.write(f"******************************\n")
         anomaly_file.write(f"Case Parameter:\n")
         anomaly_file.write("qp_num\tsvc_type\top\t\tmsg_size\tsharing_mr\n")
@@ -80,6 +85,8 @@ class iterator:
                     # if throughput is still less than 0.8, qp num is not the critical factor
                     if try_throughput < 0.8:
                         anomaly_case.param[anomaly_case.new_proc_id].qp_num = -1
+                    else:
+                        anomaly_case.fatal_param.append(0)
 
                     # change msg size
                     # 64 -> 16K
@@ -97,6 +104,8 @@ class iterator:
                     # if throughput is still less than 0.8, message size is not the critical factor
                     if try_throughput < 0.8:
                         anomaly_case.param[anomaly_case.new_proc_id].msg_size = -1
+                    else:
+                        anomaly_case.fatal_param.append(3)
 
                     # change sharing mr
                     if try_case.param[try_case.new_proc_id].sharing_mr == 0:

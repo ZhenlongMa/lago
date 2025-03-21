@@ -33,6 +33,7 @@ class test_case:
         self.param = [] # store for each process
         self.total_qp_num = 0
         self.new_proc_id = 0
+        self.fatal_param_id = []
 
     def get_active_process_num(self):
         result = 0
