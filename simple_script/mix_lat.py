@@ -2,6 +2,7 @@ import os
 import time
 import re
 import atexit
+import stop
 
 OBJ_DIR = "/work/mazhenlong/rnic_test/simple_script"
 SVR = "192.168.0.25"
@@ -23,30 +24,6 @@ avg_lat = []
 stdev_lat = []
 p99_lat = []
 p999_lat = []
-
-def stop():
-    for node in [SVR, CLT]:
-        proc_id = []
-        cmd = "ssh root@" + node + " 'ps -aux > " + OBJ_DIR + "/tmp.log'"
-        print(cmd)
-        rtn = os.system(cmd)
-        if rtn != 0:
-            raise Exception("\033[0;31;40mError for cmd \033[0m")
-        with open(OBJ_DIR + "/tmp.log", "r", encoding ="utf-8") as f:
-            for line in f.readlines():
-                line = line.strip()
-                is_match = re.findall(r"(ib_write_bw)|(ib_write_lat)", line)
-                if is_match != []:
-                    line_list = line.split()
-                    pid_num = line_list[1].strip()
-                    proc_id.append(pid_num)
-
-                    
-                    kill_cmd = "ssh root@" + node + " 'kill -9 " + pid_num + "'"
-                    print(kill_cmd)
-                    os.system(kill_cmd)
-        os.system("rm -rf " + OBJ_DIR + "/tmp.log")
-        time.sleep(1)
 
 def start_mix_latency_test(qp_num):
     SVR_CMD1 = "ib_write_bw  -p 12550 -d " + SVR_DEV  + " -i 1 -l 100 -m 4096 -c RC -q " + str(qp_num//2) + " -F -s " + str(large_size) + " --sl=0 --run_infinitely"
@@ -153,10 +130,10 @@ def print_latency():
         f.write(f"\n")
 
 if __name__ == "__main__":
-    atexit.register(stop)
+    atexit.register(stop.stop_perftest, [SVR, CLT])
     for qp_num in large_qp_num_list:
         print(f"start test, qp num: {qp_num}")
         start_mix_latency_test(qp_num)
-        stop()
+        stop.stop_perftest([SVR, CLT])
         parse_result_file()
     print_latency()
