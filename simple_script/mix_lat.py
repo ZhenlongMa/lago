@@ -130,10 +130,10 @@ def print_latency():
         f.write(f"\n")
 
 if __name__ == "__main__":
-    atexit.register(stop.stop_perftest, [SVR, CLT])
+    atexit.register(stop.stop_perftest, [SVR, CLT], OBJ_DIR)
     for qp_num in large_qp_num_list:
         print(f"start test, qp num: {qp_num}")
         start_mix_latency_test(qp_num)
-        stop.stop_perftest([SVR, CLT])
+        stop.stop_perftest([SVR, CLT], OBJ_DIR)
         parse_result_file()
     print_latency()

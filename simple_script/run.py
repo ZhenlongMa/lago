@@ -99,7 +99,7 @@ def stop():
                     # if rtn != 0:
                     #     raise Exception("kill cmd failed!")
         os.system("rm -rf " + OBJ_DIR + "/tmp.log")
-        time.sleep(3)
+        time.sleep(1)
 
 def vary_large_qp_num():
     large_qp_num_list = [0, 1, 2, 4, 8, 16]
