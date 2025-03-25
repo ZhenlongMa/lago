@@ -32,7 +32,7 @@ class test_config:
             self.object_directory = "/home/mazhenl/shared/rnic_test/python_based" # for DPU platform
 
             # Communication parameters
-            self.test_type = "ib_write_bw"
+            # self.test_type = "ib_write_bw"
             self.wqe_num = 100
             self.mtu = 4096
             self.gid_index = "0"
@@ -50,7 +50,7 @@ class test_config:
             self.object_directory = "/work/mazhenlong/rnic_test/python_based" # for 23/25 platform
 
             # Communication parameters
-            self.test_type = "ib_write_bw"
+            # self.test_type = "ib_write_bw"
             self.wqe_num = 100
             self.mtu = 4096
             self.gid_index = "0"
@@ -65,16 +65,10 @@ class test_config:
             self.peak_bdp = 100 # Gbps
         else:
             raise Exception(f"Illegal platform! {platform}")
-    
-    # def generate_init_case(self):
-    #     self.case_param_vector = ["1 1 1 64 0"]
-    #     test_param = self.param(1, "RC", "WRITE", 64, True)
-    #     self.case_param.append(test_param)
 
     # generate the boundary of the test and save as a case
     # todo: change this version to be more heterogeneous and randomized
     def generate_terminus(self):
-        terminus_process_num = 7
         self.terminus = test_case.test_case()
         # todo: server side launch
         for i in range(3):
