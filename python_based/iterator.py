@@ -22,8 +22,8 @@ class iterator:
         anomaly_file.write(f"Throughput: {throughput}\n")
         anomaly_file.write(f"anomaly process id: {case.new_proc_id}\n")
         anomaly_file.write(f"fatal param: ")
-        for i in range(len(case.anomaly_param)):
-            anomaly_file.write(f"{case.anomaly_param[i]} ")
+        for i in range(len(case.fatal_param)):
+            anomaly_file.write(f"{case.fatal_param[i]} ")
         anomaly_file.write(f"\n")
         anomaly_file.write(f"******************************\n")
         anomaly_file.write(f"Case Parameter:\n")
