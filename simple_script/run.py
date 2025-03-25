@@ -102,8 +102,8 @@ def stop():
         time.sleep(3)
 
 def vary_large_qp_num():
-    # large_qp_num_list = [0, 40]
-    large_qp_num_list = [0]
+    large_qp_num_list = [0, 1, 2, 4, 8, 16]
+    # large_qp_num_list = [0]
     # large_qp_num_list = [2]
     small_qp_num = 4
     small_msg_size = 64
