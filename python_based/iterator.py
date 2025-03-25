@@ -123,6 +123,8 @@ class iterator:
                     try_throughput = self.analyzer.calculate_throughput(try_case)
                     if try_throughput < 0.8:
                         anomaly_case.param[anomaly_case.new_proc_id].op = "ANY"
+                    else:
+                        anomaly_case.fatal_param.append(2)
 
                     self.anomaly_case.append(anomaly_case)
                     self.record_case_throughput(anomaly_case, throughput)
