@@ -105,7 +105,7 @@ def vary_large_qp_num():
     large_qp_num_list = [0, 1, 2, 4, 8, 16]
     # large_qp_num_list = [0]
     # large_qp_num_list = [2]
-    small_qp_num = 1 # x4
+    small_qp_num = 16 # x4
     small_msg_size = 64
     large_msg_size = 2500000
     test = TEST_LIST[0]

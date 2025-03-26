@@ -3,24 +3,23 @@ import time
 import re
 import atexit
 
-OBJ_DIR = "/home/mazhenl/shared/rnic_test/simple_script"
+OBJ_DIR = "/work/mazhenlong/rnic_test/simple_script"
 
 # communication parameters
 TEST_TYPE = "ib_write_bw"
 # QP_NUM = 128
-MSG_SZ = 64
 WQE_NUM = 100
 MTU = 4096
 
 # host parameters
-SVR1 = "10.5.200.186"
-SVR2 = "10.5.200.186"
-SVR3 = "10.5.200.186"
-SVR4 = "10.5.200.186"
-CLT1 = "10.5.200.187"
-CLT2 = "10.5.200.187"
-CLT3 = "10.5.200.187"
-CLT4 = "10.5.200.187"
+SVR1 = "192.168.0.23"
+SVR2 = "192.168.0.23"
+SVR3 = "192.168.0.23"
+SVR4 = "192.168.0.23"
+CLT1 = "192.168.0.25"
+CLT2 = "192.168.0.25"
+CLT3 = "192.168.0.25"
+CLT4 = "192.168.0.25"
 SVR1_DEV = "mlx5_0"
 SVR2_DEV = "mlx5_0"
 SVR3_DEV = "mlx5_0"
@@ -44,14 +43,14 @@ def start_test(qp_num, msg_sz):
     CLT3_CMD = TEST_TYPE + " -p 12333 -d " + CLT3_DEV + " -i 1 -l " + str(WQE_NUM) + " -m " + str(MTU) + " -c RC -x " + GID_INDEX + " -q " + str(qp_num) + " -F -s " + str(msg_sz) + " --run_infinitely " + SVR3
     CLT4_CMD = TEST_TYPE + " -p 12334 -d " + CLT4_DEV + " -i 1 -l " + str(WQE_NUM) + " -m " + str(MTU) + " -c RC -x " + GID_INDEX + " -q " + str(qp_num) + " -F -s " + str(msg_sz) + " --run_infinitely " + SVR4
     cmd_list = [
-        "ssh mazhenl@" + SVR1 + " 'cd " + OBJ_DIR + " && " + SVR_CMD1 + " > test_result_s1 &'&",
-        "ssh mazhenl@" + SVR2 + " 'cd " + OBJ_DIR + " && " + SVR_CMD2 + " > test_result_s2 &'&",
-        "ssh mazhenl@" + SVR3 + " 'cd " + OBJ_DIR + " && " + SVR_CMD3 + " > test_result_s3 &'&",
-        "ssh mazhenl@" + SVR4 + " 'cd " + OBJ_DIR + " && " + SVR_CMD4 + " > test_result_s4 &'&",
-        "ssh mazhenl@" + CLT1 + " 'cd " + OBJ_DIR + " && " + CLT1_CMD + " > test_result_c1 &'&",
-        "ssh mazhenl@" + CLT2 + " 'cd " + OBJ_DIR + " && " + CLT2_CMD + " > test_result_c2 &'&",
-        "ssh mazhenl@" + CLT3 + " 'cd " + OBJ_DIR + " && " + CLT3_CMD + " > test_result_c3 &'&",
-        "ssh mazhenl@" + CLT4 + " 'cd " + OBJ_DIR + " && " + CLT4_CMD + " > test_result_c4 &'&"
+        "ssh root@" + SVR1 + " 'cd " + OBJ_DIR + " && " + SVR_CMD1 + " > test_result_s1 &'&",
+        "ssh root@" + SVR2 + " 'cd " + OBJ_DIR + " && " + SVR_CMD2 + " > test_result_s2 &'&",
+        "ssh root@" + SVR3 + " 'cd " + OBJ_DIR + " && " + SVR_CMD3 + " > test_result_s3 &'&",
+        "ssh root@" + SVR4 + " 'cd " + OBJ_DIR + " && " + SVR_CMD4 + " > test_result_s4 &'&",
+        "ssh root@" + CLT1 + " 'cd " + OBJ_DIR + " && " + CLT1_CMD + " > test_result_c1 &'&",
+        "ssh root@" + CLT2 + " 'cd " + OBJ_DIR + " && " + CLT2_CMD + " > test_result_c2 &'&",
+        "ssh root@" + CLT3 + " 'cd " + OBJ_DIR + " && " + CLT3_CMD + " > test_result_c3 &'&",
+        "ssh root@" + CLT4 + " 'cd " + OBJ_DIR + " && " + CLT4_CMD + " > test_result_c4 &'&"
     ]
     for cmd in cmd_list:
         print("\033[0;32;40m" + cmd + "\033[0m")
@@ -81,28 +80,9 @@ def parse_file(file_name, msg_sz):
         return (sum(res) / len(res))
 
 def stop(machine_list):
-    print("clean process by netstat!")
-    for node in machine_list:
-        cmd = "ssh mazhenl@" + node + " 'netstat -t -p > " + OBJ_DIR + "/tmp.log'"
-        print(cmd)
-        rtn = os.system(cmd)
-        if rtn != 0:
-            raise Exception("\033[0;31;40mError for cmd \033[0m")
-        with open(OBJ_DIR + "/tmp.log", "r", encoding ="utf-8") as f:
-            for line in f.readlines():
-                line = line.strip()
-                str_list = line.split(' ')
-                # print(str_list)
-                res = re.findall(r"(.+?)/"+TEST_TYPE, str_list[-1])
-                if res != []:
-                    print(res)
-                    print("ssh mazhenl@" + node + " 'kill -9 " + res[0] + "'")
-                    os.system("ssh mazhenl@" + node + " 'kill -9 " + res[0] + "'")
-        os.system("rm -rf " + OBJ_DIR + "/tmp.log")
-        time.sleep(3)
     print("clean process by ps!")
     for node in machine_list:
-        cmd = "ssh mazhenl@" + node + " 'ps -aux > " + OBJ_DIR + "/tmp.log'"
+        cmd = "ssh root@" + node + " 'ps -aux > " + OBJ_DIR + "/tmp.log'"
         print(cmd)
         rtn = os.system(cmd)
         if rtn != 0:
@@ -114,7 +94,7 @@ def stop(machine_list):
                 if is_match != []:
                     line_list = line.split()
                     pid_num = line_list[1].strip()
-                    kill_cmd = "ssh mazhenl@" + node + " 'kill -9 " + pid_num + "'"
+                    kill_cmd = "ssh root@" + node + " 'kill -9 " + pid_num + "'"
                     print(kill_cmd)
                     os.system(kill_cmd)
         os.system("rm -rf " + OBJ_DIR + "/tmp.log")
@@ -125,7 +105,7 @@ def bw_test(qp_num, msg_sz):
     print("Start testing.......")
     machine_list = [SVR1, SVR2, SVR3, SVR4, CLT1, CLT2, CLT3, CLT4]
     start_test(qp_num, msg_sz)
-    time.sleep(10)
+    time.sleep(20)
     stop(machine_list)
     msg_rate = parse_file("test_result_c1", msg_sz) + parse_file("test_result_c2", msg_sz) + parse_file("test_result_c3", msg_sz) + parse_file("test_result_c4", msg_sz)
     print("Msg rate for " + str(qp_num) + " QPs is " + str(msg_rate) + "op/s")
@@ -134,8 +114,9 @@ def bw_test(qp_num, msg_sz):
 
 def main():
     str_out = "Number of QPs\tmsg rate(Mops)\n"
-    # qp_num_list = [4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048, 4096, 8192]
-    qp_num_list = [4]
+    qp_num_list = [1, 4, 8, 16, 32, 64, 256, 512, 1024, 2048, 4096]
+    MSG_SZ = 2048
+    # qp_num_list = [4]
     with open(TEST_TYPE+"-out.log", "w") as f:
         for qp_num in qp_num_list:
             print("-------------------------------------------------------------------")
@@ -146,6 +127,6 @@ def main():
         f.write(str_out)
 
 if __name__ == "__main__":
-    atexit.register(stop)
+    atexit.register(stop, [SVR1, CLT1])
     main()
     # stop()
